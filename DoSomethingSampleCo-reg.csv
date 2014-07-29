@@ -1,0 +1,7 @@
+first_name,last_name,email,hsgradyear,gender,address1,address2,city,state,postal_code,phone_home,gpa,dob,race,religion,hs_name,college_name,degree_type,major,satmath,satverbal,satwriting,actmath,actenglish
+Test1,Test1,Test1@test.com,2012,Female,123 Main Street,Apt 456,Pittsburgh,PA,15235,4123615080,3.9,11/23/1996,C,Presbyterian,Princeton High School,Carnegie Mellon University,Master,Computer Science,500,600,700,,
+Test2,Test2,Test2@test.com,2013,Male,456 Main Street,,Pittsburgh,PA,15232,4125551212,3.4,7/15/1997,B,Church of God,Coral Springs High School,University of Pittsburgh,Doctorate ,Business Management,,,,,
+Test3,Test3,Test3@test.com,2014,Female,789 Main Street,Apt B4,Pittsburgh,PA,15212,7245551212,4,3/27/1997,C,Methodist,Edward R. Murrow High School,Harvard University,Bachelor,Pre-Medicine Studies,,,,,
+Test4,Test4,Test4@test.com,2015,Male,123 North Street,,Pittsburgh,PA,15235,6105551212,2,6/24/1997,X,Baptist,Crossland High School,Indiana University - Bloomington,Certificate,History Teacher Education,,,,30,32
+Test5,Test5,Test5@test.com,2016,Female,456 North Street,,Pittsburgh,PA,15235,3305551212,2.9,2/14/1998,C,Baptist,"Licking Heights High School
+Licking Heights High School",University of California - Los Angeles,Bachelor,Public Relations,,,,,
