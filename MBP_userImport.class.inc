@@ -188,7 +188,7 @@ class MBP_UserImport
              $data['role'] = str_replace("\r\n", '', str_replace('"', '', $signupData[23]));
             }
 
-            $payload = serialize($data);
+            $payload = json_encode($data);
             $status = $this->messageBroker->publishMessage($payload);
 
             $this->statHat->addStatName('produceCSVImport');
