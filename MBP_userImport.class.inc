@@ -86,9 +86,9 @@ class MBP_UserImport
           $signupData = explode(',', $signup);
 
           // Required
-          if ($signupData[2] != '' &&
-              $signupData[0] != '' &&
-              $signupData[10] != '') {
+          if ((isset($signupData[2]) && $signupData[2] != '') &&
+              (isset($signupData[0]) && $signupData[0] != '') &&
+              (isset($signupData[10]) && $signupData[10] != '')) {
 
             $data = array();
             $data = array(
