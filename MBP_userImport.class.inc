@@ -187,12 +187,7 @@ class MBP_UserImport
             if (isset($signupData[23]) && $signupData[23] != '' && $signupData[23] != "\r\n") {
              $data['role'] = str_replace("\r\n", '', str_replace('"', '', $signupData[23]));
             }
-            
-            
-$bla = FALSE;
-if ($bla) {
-  $bla = TRUE;
-}
+
             $payload = serialize($data);
             $status = $this->messageBroker->publishMessage($payload);
 
