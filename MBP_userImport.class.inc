@@ -86,19 +86,20 @@ class MBP_UserImport
           $signupData = explode(',', $signup);
 
           // Required
-          if ((isset($signupData[2]) && $signupData[2] != '') &&
-              (isset($signupData[0]) && $signupData[0] != '') &&
-              (isset($signupData[10]) && $signupData[10] != '')) {
+          if (isset($signupData[2]) && $signupData[2] != '') {
 
             $data = array();
             $data = array(
               'email' => str_replace('"', '', $signupData[2]),
-              'first_name' => str_replace('"', '', $signupData[0]),
               'subscribed' => 1,
               'activity_timestamp' => time(),
               'application_id' => 100, // Import
             );
 
+            // First name
+            if (isset($signupData[0]) && $signupData[0] != '') {
+             $data['first_name'] = str_replace('"', '', $signupData[0]);
+            }
             // Last name
             if (isset($signupData[1]) && $signupData[1] != '') {
              $data['last_name'] = str_replace('"', '', $signupData[1]);
@@ -132,8 +133,8 @@ class MBP_UserImport
              $data['high_school_grad_year'] = str_replace('"', '', $signupData[9]);
             }
             // Birthdate
-            if (isset($signupData[10]) && $signupData[10] != '' && $signupData[10] != 0) {
-             $data['high_school_grad_year'] = str_replace('"', '', $signupData[9]);
+            if (isset($signupData[10]) && $signupData[10] != '' && $signupData[10] != '0') {
+             $data['birthdate'] = strtotime(str_replace('"', '', $signupData[10]));
             }
             // race
             if (isset($signupData[11]) && $signupData[11] != '' && $signupData[11] != '""') {
