@@ -106,11 +106,11 @@ class MBP_UserImport
             }
             // Address 1
             if (isset($signupData[3]) && $signupData[3] != '') {
-             $data['address_1'] = str_replace('"', '', $signupData[3]);
+             $data['address1'] = str_replace('"', '', $signupData[3]);
             }
             // Address 2
             if (isset($signupData[4]) && $signupData[4] != '') {
-             $data['address_2'] = str_replace('"', '', $signupData[4]);
+             $data['address2'] = str_replace('"', '', $signupData[4]);
             }
             // City
             if (isset($signupData[5]) && $signupData[5] != '') {
@@ -206,7 +206,7 @@ class MBP_UserImport
       return FALSE;
     }
 
-    echo $signupCount . 'email addresses imported.' . $skipped . ' skipped.', "\n";
+    echo $signupCount . ' email addresses imported.' . $skipped . ' skipped.', "\n";
     echo '------- mbp-user-import->produceCSVImport() END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
   }
 
