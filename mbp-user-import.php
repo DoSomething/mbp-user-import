@@ -55,7 +55,6 @@ $settings = array(
 
 echo '------- mbp-user-import START: ' . date('D M j G:i:s T Y') . ' -------', "\n";
 
-
 // Kick off
 // Create entries in userImportQueue based on csv.
 $mbpUserImport = new MBP_UserImport($credentials, $config, $settings);
