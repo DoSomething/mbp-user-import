@@ -71,6 +71,9 @@ class MBP_UserImport
 
     $this->statHat = new StatHat($settings['stathat_ez_key'], 'mbp-user-import:');
     $this->statHat->setIsProduction(FALSE);
+
+    $this->existingStatus['email'] = 0;
+    $this->existingStatus['mobile'] = 0;
   }
 
   /*
@@ -181,8 +184,6 @@ class MBP_UserImport
     if ($mobilecommonsStatus) {
       $this->existingStatus['mobile']++;
     }
-
-    return $existingStatus;
   }
 
 }
