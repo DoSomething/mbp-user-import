@@ -69,6 +69,7 @@ class MBP_UserImport
     echo '------- mbp-user-import->produceCSVImport() START: ' . date('D M j G:i:s T Y') . ' -------', "\n";
 
     $skipped = 0;
+    $signupKeys = array();
 
     $targetCSVFile = __DIR__ . '/' . $targetCSVFile;
     $signups = file($targetCSVFile);
@@ -98,7 +99,7 @@ class MBP_UserImport
             'activity_timestamp' => time(),
             'application_id' => 100, // Import
           );
-          foreach($signupKeys as $signupIndex => $signupKey) {
+          foreach ($signupKeys as $signupIndex => $signupKey) {
             if ($signupData[$signupIndex] != '') {
               $data[$signupKey] = $signupData[$signupIndex];
             }
