@@ -124,7 +124,6 @@ class MBP_UserImport
       return FALSE;
     }
 
-    echo $this->existingStatus['email'] . ' already exsist in Mailchimp. ' . $this->existingStatus['mobile'] . ' already esist in Mobile Commons.', "\n";
     echo $signupCount . ' email addresses imported.' . $skipped . ' skipped.', "\n";
     echo '------- mbp-user-import->produceCSVImport() END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
   }
