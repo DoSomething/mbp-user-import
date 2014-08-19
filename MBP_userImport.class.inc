@@ -100,7 +100,7 @@ class MBP_UserImport
             'application_id' => 100, // Import
           );
           foreach ($signupKeys as $signupIndex => $signupKey) {
-            if ($signupData[$signupIndex] != '') {
+            if (isset($signupData[$signupIndex]) && $signupData[$signupIndex] != '') {
               $data[$signupKey] = $signupData[$signupIndex];
             }
           }
