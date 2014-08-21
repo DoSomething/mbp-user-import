@@ -55,7 +55,7 @@ class MBP_UserImport
     $this->messageBroker = new MessageBroker($credentials, $config);
 
     $this->statHat = new StatHat($settings['stathat_ez_key'], 'mbp-user-import:');
-    $this->statHat->setIsProduction(FALSE);
+    $this->statHat->setIsProduction(TRUE);
   }
 
   /*
@@ -106,17 +106,17 @@ class MBP_UserImport
           }
 
           // Required
+          $this->statHat->clearAddedStatNames();
           if (isset($data['email']) && $data['email'] != '') {
-
             $payload = json_encode($data);
             $status = $this->messageBroker->publishMessage($payload);
-
             $this->statHat->addStatName('produceCSVImport');
-            $this->statHat->reportCount($signupCount);
           }
           else {
             $skipped++;
+            $this->statHat->addStatName('skippedCSVImport - invalid email');
           }
+          $this->statHat->reportCount(1);
         }
       }
     }
