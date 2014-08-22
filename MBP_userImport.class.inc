@@ -45,13 +45,6 @@ class MBP_UserImport
   private $statHat;
 
   /**
-   * Track the number of existing email and mobile accounts
-   *
-   * @var array
-   */
-  private $existingStatus;
-
-  /**
    * Constructor for MBC_UserEvent
    *
    * @param array $credentials
@@ -71,9 +64,6 @@ class MBP_UserImport
 
     $this->statHat = new StatHat($settings['stathat_ez_key'], 'mbp-user-import:');
     $this->statHat->setIsProduction(FALSE);
-
-    $this->existingStatus['email'] = 0;
-    $this->existingStatus['mobile'] = 0;
   }
 
   /*
@@ -88,6 +78,10 @@ class MBP_UserImport
 
     $skipped = 0;
     $signupKeys = array();
+    $existingStatus = array(
+      'email' => 0,
+      'mobile' => 0
+    );
 
     $targetCSVFile = __DIR__ . '/' . $targetCSVFile;
     $signups = file($targetCSVFile);
@@ -102,9 +96,11 @@ class MBP_UserImport
           exit;
         }
 
+        // Clean up first
         $signup = str_replace('"', '',  $signup);
         $signup = str_replace("\r\n", '',  $signup);
 
+        // The first row (zero index) defines the column names
         if ($signupCount == 0) {
            $signupKeys = explode(',', $signup);
         }
@@ -127,7 +123,7 @@ class MBP_UserImport
           if (isset($data['email']) && $data['email'] != '') {
 
             // Check for existing email and mobile accounts
-            $this->checkExistingAccount($data);
+            $this->checkExistingAccount($data, $existingStatus);
 
             $payload = json_encode($data);
             $status = $this->messageBroker->publishMessage($payload);
@@ -146,7 +142,7 @@ class MBP_UserImport
       return FALSE;
     }
 
-    echo $this->existingStatus['email'] . ' already exsist in Mailchimp. ' . $this->existingStatus['mobile'] . ' already esist in Mobile Commons.', "\n";
+    echo $existingStatus['email'] . ' already exsist in Mailchimp. ' . $existingStatus['mobile'] . ' already esist in Mobile Commons.', "\n";
     echo $signupCount . ' email addresses imported.' . $skipped . ' skipped.', "\n";
     echo '------- mbp-user-import->produceCSVImport() END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
   }
@@ -157,8 +153,11 @@ class MBP_UserImport
    *
    * @param array $data
    *   Information about a user to be imported into the DoSomething systems.
+   *
+   * @param array $existingStatus
+   *   Log if an email or mobile number already exist.
    */
-  private function checkExistingAccount($data) {
+  private function checkExistingAccount($data, $existingStatus) {
 
     // http://apidocs.mailchimp.com/api/2.0/lists/member-info.php
     $MailChimp = new \Drewm\MailChimp($this->settings['mailchimp_apikey']);
@@ -171,7 +170,7 @@ class MBP_UserImport
       )
     ));
     if ($mailchimpStatus) {
-      $this->existingStatus['email']++;
+      $existingStatus['email']++;
     }
 
     // https://mobilecommons.zendesk.com/hc/en-us/articles/202052534-REST-API#ProfileSummary
@@ -182,8 +181,10 @@ class MBP_UserImport
     $MobileCommons = new MobileCommons($config);
     $mobilecommonsStatus = $MobileCommons->profile(array('phone_number' => $data['phone']));
     if ($mobilecommonsStatus) {
-      $this->existingStatus['mobile']++;
+      $existingStatus['mobile']++;
     }
+
+    return $existingStatus;
   }
 
 }
