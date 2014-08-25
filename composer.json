@@ -1,7 +1,7 @@
 {
     "name": "https://github.com/DoSomething/mbp-user-import",
     "type": "project",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "A producer app for the Message Broker system that imports users from niche.com that have expressed an interest in DoSomething scholorships.",
     "keywords": ["message broker"],
     "homepage": "https://github.com/DoSomething/mbp-user-import",
