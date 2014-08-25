@@ -123,7 +123,7 @@ class MBP_UserImport
           if (isset($data['email']) && $data['email'] != '') {
 
             // Check for existing email and mobile accounts
-            $this->checkExistingAccount($data, $existingStatus);
+            $existingStatus = $this->checkExistingAccount($data, $existingStatus);
 
             $payload = json_encode($data);
             $status = $this->messageBroker->publishMessage($payload);
@@ -142,7 +142,7 @@ class MBP_UserImport
       return FALSE;
     }
 
-    echo $existingStatus['email'] . ' already exsist in Mailchimp. ' . $existingStatus['mobile'] . ' already esist in Mobile Commons.', "\n";
+    echo $existingStatus['email'] . ' already exist in Mailchimp. ' . $existingStatus['mobile'] . ' already exist in Mobile Commons.', "\n";
     echo $signupCount . ' email addresses imported.' . $skipped . ' skipped.', "\n";
     echo '------- mbp-user-import->produceCSVImport() END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
   }
