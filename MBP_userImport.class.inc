@@ -121,9 +121,6 @@ class MBP_UserImport
           // Required
           $this->statHat->clearAddedStatNames();
           if (isset($data['email']) && $data['email'] != '') {
-            
-            // Check for existing email and mobile accounts
-            $existingStatus = $this->checkExistingAccount($data, $existingStatus);
 
             $payload = json_encode($data);
             $status = $this->messageBroker->publishMessage($payload);
@@ -142,49 +139,8 @@ class MBP_UserImport
       return FALSE;
     }
 
-    echo $existingStatus['email'] . ' already exist in Mailchimp. ' . $existingStatus['mobile'] . ' already exist in Mobile Commons.', "\n";
     echo $signupCount . ' email addresses imported.' . $skipped . ' skipped.', "\n";
     echo '------- mbp-user-import->produceCSVImport() END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
-  }
-
-  /*
-   * Check for the existance of email (Mailchimp) and mobile (Mobile Commons)
-   * accounts.
-   *
-   * @param array $data
-   *   Information about a user to be imported into the DoSomething systems.
-   *
-   * @param array $existingStatus
-   *   Log if an email or mobile number already exist.
-   */
-  private function checkExistingAccount($data, $existingStatus) {
-
-    // http://apidocs.mailchimp.com/api/2.0/lists/member-info.php
-    $MailChimp = new \Drewm\MailChimp($this->settings['mailchimp_apikey']);
-    $mailchimpStatus = $MailChimp->call("/lists/member-info", array(
-      'id' => $this->settings['mailchimp_list_id'],
-      'emails' => array(
-        array(
-          'email' => $data['email']
-        ),
-      )
-    ));
-    if ($mailchimpStatus) {
-      $existingStatus['email']++;
-    }
-
-    // https://mobilecommons.zendesk.com/hc/en-us/articles/202052534-REST-API#ProfileSummary
-    $config = array(
-      'username' => $this->settings['mobile_commons_user'],
-      'password' => $this->settings['mobile_commons_password'],
-    );
-    $MobileCommons = new MobileCommons($config);
-    $mobilecommonsStatus = $MobileCommons->profile(array('phone_number' => $data['phone']));
-    if ($mobilecommonsStatus) {
-      $existingStatus['mobile']++;
-    }
-
-    return $existingStatus;
   }
 
 }
