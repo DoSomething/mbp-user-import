@@ -84,10 +84,9 @@ class MBP_UserImport
     );
 
     $targetCSVFile = __DIR__ . '/' . $targetCSVFile;
-    $signups = file($targetCSVFile);
-
     // Was there a file found
-    if ($signups != FALSE) {
+    if (file_exists($targetCSVFile)) {
+      $signups = file($targetCSVFile);
       foreach ($signups as $signupCount => $signup) {
 
         // Check that the coloumn assignment are as expected
