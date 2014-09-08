@@ -139,8 +139,60 @@ class MBP_UserImport
       return FALSE;
     }
 
+    $signupCount = $signupCount + 1;
+    $skipped = $skipped - 1;
+
+    // Log activity
+    $this->logging($signupCount, $skipped, $targetCSVFile);
+
     echo $signupCount . ' email addresses imported.' . $skipped . ' skipped.', "\n";
     echo '------- mbp-user-import->produceCSVImport() END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
+
+  }
+
+  /*
+   * Produce entries in the MB_USER_IMPORT_LOGGING_QUEUE to log the total number
+   * of user impoarts and skipped entries from a CSV import file.
+   *
+   * @param integer $signupCount
+   *   Total number of entries added to the queue.
+   *
+   * @param integer $skipped
+   *   Total number of entries skipped.
+   *
+   * @param string $targetCSVFile
+   *   The file name of the CSV import file.
+   */
+  private function logging($signupCount, $skipped, $targetCSVFile) {
+
+    $config = array(
+      'exchange' => array(
+        'name' => getenv("MB_USER_IMPORT_LOGGING_EXCHANGE"),
+        'type' => getenv("MB_USER_IMPORT_LOGGING_EXCHANGE_TYPE"),
+        'passive' => getenv("MB_USER_IMPORT_LOGGING_EXCHANGE_PASSIVE"),
+        'durable' => getenv("MB_USER_IMPORT_LOGGING_EXCHANGE_DURABLE"),
+        'auto_delete' => getenv("MB_USER_IMPORT_LOGGING_EXCHANGE_AUTO_DELETE"),
+      ),
+      'queue' => array(
+        'user_import' => array(
+          'name' => getenv("MB_USER_IMPORT_LOGGING_QUEUE"),
+          'passive' => getenv("MB_USER_IMPORT_LOGGING_QUEUE_PASSIVE"),
+          'durable' => getenv("MB_USER_IMPORT_LOGGING_QUEUE_DURABLE"),
+          'exclusive' => getenv("MB_USER_IMPORT_LOGGING_QUEUE_EXCLUSIVE"),
+          'auto_delete' => getenv("MB_USER_IMPORT_LOGGING_QUEUE_AUTO_DELETE"),
+          'bindingKey' => getenv("MB_USER_IMPORT_LOGGING_QUEUE_TOPIC_MB_TRANSACTIONAL_EXCHANGE_PATTERN"),
+        ),
+      ),
+    );
+    $mbUserImportLogging = new MessageBroker($this->credentials, $config);
+
+    $importVolume['targetCSVFile'] = $targetCSVFile;
+    $importVolume['signupCount'] = $signupCount;
+    $importVolume['skipped'] = $skipped;
+    $importVolume['logged'] = time();
+    $payload = serialize($importVolume);
+    $mbUserImportLogging->publishMessage($payload);
+
   }
 
 }
