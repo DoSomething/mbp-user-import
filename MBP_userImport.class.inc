@@ -83,6 +83,7 @@ class MBP_UserImport
       'mobile' => 0
     );
 
+    $targetCSVFileName = $targetCSVFile;
     $targetCSVFile = __DIR__ . '/' . $targetCSVFile;
     // Was there a file found
     if (file_exists($targetCSVFile)) {
@@ -139,11 +140,8 @@ class MBP_UserImport
       return FALSE;
     }
 
-    $signupCount = $signupCount + 1;
-    $skipped = $skipped - 1;
-
     // Log activity
-    $this->logging($signupCount, $skipped, $targetCSVFile);
+    $this->logging($signupCount, $skipped, $targetCSVFileName);
 
     echo $signupCount . ' email addresses imported.' . $skipped . ' skipped.', "\n";
     echo '------- mbp-user-import->produceCSVImport() END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
