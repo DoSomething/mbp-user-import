@@ -184,11 +184,12 @@ class MBP_UserImport
     );
     $mbUserImportLogging = new MessageBroker($this->credentials, $config);
 
-    $importVolume['targetCSVFile'] = $targetCSVFile;
-    $importVolume['signupCount'] = $signupCount;
-    $importVolume['skipped'] = $skipped;
-    $importVolume['logged'] = time();
-    $payload = serialize($importVolume);
+    $importStat['eventType'] = 'File import';
+    $importStat['targetCSVFile'] = $targetCSVFile;
+    $importStat['signupCount'] = $signupCount;
+    $importStat['skipped'] = $skipped;
+    $importStat['logged'] = time();
+    $payload = serialize($importStat);
     $mbUserImportLogging->publishMessage($payload);
 
   }
