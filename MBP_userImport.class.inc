@@ -63,7 +63,7 @@ class MBP_UserImport
     $this->messageBroker = new MessageBroker($credentials, $config);
 
     $this->statHat = new StatHat($settings['stathat_ez_key'], 'mbp-user-import:');
-    $this->statHat->setIsProduction(TRUE);
+    $this->statHat->setIsProduction(FALSE);
   }
 
   /*
@@ -184,11 +184,11 @@ class MBP_UserImport
     );
     $mbUserImportLogging = new MessageBroker($this->credentials, $config);
 
-    $importStat['eventType'] = 'File import';
-    $importStat['targetCSVFile'] = $targetCSVFile;
-    $importStat['signupCount'] = $signupCount;
+    $importStat['log-type'] = 'file-import';
+    $importStat['target-CSV-file'] = $targetCSVFile;
+    $importStat['signup-count'] = $signupCount;
     $importStat['skipped'] = $skipped;
-    $importStat['logged'] = time();
+    $importStat['log-timestamp'] = time();
     $payload = serialize($importStat);
     $mbUserImportLogging->publishMessage($payload);
 
