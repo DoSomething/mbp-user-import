@@ -63,7 +63,7 @@ class MBP_UserImport
     $this->messageBroker = new MessageBroker($credentials, $config);
 
     $this->statHat = new StatHat($settings['stathat_ez_key'], 'mbp-user-import:');
-    $this->statHat->setIsProduction(TRUE);
+    $this->statHat->setIsProduction(FALSE);
   }
 
   /*
@@ -83,6 +83,7 @@ class MBP_UserImport
       'mobile' => 0
     );
 
+    $targetCSVFileName = $targetCSVFile;
     $targetCSVFile = __DIR__ . '/' . $targetCSVFile;
     // Was there a file found
     if (file_exists($targetCSVFile)) {
@@ -139,11 +140,8 @@ class MBP_UserImport
       return FALSE;
     }
 
-    $signupCount = $signupCount + 1;
-    $skipped = $skipped - 1;
-
     // Log activity
-    $this->logging($signupCount, $skipped, $targetCSVFile);
+    $this->logging($signupCount, $skipped, $targetCSVFileName);
 
     echo $signupCount . ' email addresses imported.' . $skipped . ' skipped.', "\n";
     echo '------- mbp-user-import->produceCSVImport() END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
@@ -186,11 +184,12 @@ class MBP_UserImport
     );
     $mbUserImportLogging = new MessageBroker($this->credentials, $config);
 
-    $importVolume['targetCSVFile'] = $targetCSVFile;
-    $importVolume['signupCount'] = $signupCount;
-    $importVolume['skipped'] = $skipped;
-    $importVolume['logged'] = time();
-    $payload = serialize($importVolume);
+    $importStat['log-type'] = 'file-import';
+    $importStat['target-CSV-file'] = $targetCSVFile;
+    $importStat['signup-count'] = $signupCount;
+    $importStat['skipped'] = $skipped;
+    $importStat['log-timestamp'] = time();
+    $payload = serialize($importStat);
     $mbUserImportLogging->publishMessage($payload);
 
   }
