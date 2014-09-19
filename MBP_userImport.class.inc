@@ -80,7 +80,8 @@ class MBP_UserImport
     $signupKeys = array();
     $existingStatus = array(
       'email' => 0,
-      'mobile' => 0
+      'mobile' => 0,
+      'drupal' => 0
     );
 
     $targetCSVFileName = $targetCSVFile;
@@ -127,7 +128,7 @@ class MBP_UserImport
             $status = $this->messageBroker->publishMessage($payload);
             $this->statHat->addStatName('produceCSVImport');
           }
-          else {
+          elseif ($signupCount < count($signups) - 1) {
             $skipped++;
             $this->statHat->addStatName('skippedCSVImport - invalid email');
           }
@@ -189,6 +190,7 @@ class MBP_UserImport
     $importStat['signup-count'] = $signupCount;
     $importStat['skipped'] = $skipped;
     $importStat['log-timestamp'] = time();
+    $importStat['source'] = 'niche.com';
     $payload = serialize($importStat);
     $mbUserImportLogging->publishMessage($payload);
 
