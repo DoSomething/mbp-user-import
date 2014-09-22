@@ -18,3 +18,4 @@ config.inc
 
 # Ignor .csv import files
 *.csv
+/data/

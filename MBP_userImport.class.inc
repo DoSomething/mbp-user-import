@@ -85,7 +85,7 @@ class MBP_UserImport
     );
 
     $targetCSVFileName = $targetCSVFile;
-    $targetCSVFile = __DIR__ . '/' . $targetCSVFile;
+    $targetCSVFile = __DIR__ . '/data/' . $targetCSVFile;
     // Was there a file found
     if (file_exists($targetCSVFile)) {
       $signups = file($targetCSVFile);
