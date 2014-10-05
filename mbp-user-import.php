@@ -68,7 +68,7 @@ elseif (isset($argv[1])) {
 }
 else {
   $targetFile = date("Y-m-d") . '.csv';
-  if (file_exists('data/' . $targetFile) == TRUE) {
+  if (file_exists(__FILE__ . '/data/' . $targetFile) == TRUE) {
     $mbpUserImport->produceCSVImport($targetFile);
   }
   else {
