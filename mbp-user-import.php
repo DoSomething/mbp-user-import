@@ -67,7 +67,14 @@ elseif (isset($argv[1])) {
   $mbpUserImport->produceCSVImport($argv[1]);
 }
 else {
-  echo 'targetFile not supplied.', "\n";
+  $targetFile = date("Y-m-d") . '.csv';
+  if (file_exists('data/' . $targetFile) == TRUE) {
+    $mbpUserImport->produceCSVImport($targetFile);
+  }
+  else {
+    echo 'targetFile not found in /data', "\n";
+  }
+
 }
 
 echo '------- mbp-user-import END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
