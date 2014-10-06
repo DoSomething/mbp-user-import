@@ -209,8 +209,7 @@ class MBP_UserImport
    */
   private function archiveCSV($targetCSVFile) {
 
-    $targetCSVFile = __DIR__ . '/data/' . $targetCSVFile;
-    $processedCSVFile = __DIR__ . '/data/' . $targetCSVFile . '.' . time();
+    $processedCSVFile = $targetCSVFile . '.' . time();
     $archived = rename ($targetCSVFile, $processedCSVFile);
 
     if ($archived) {
