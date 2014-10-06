@@ -63,7 +63,7 @@ class MBP_UserImport
     $this->messageBroker = new MessageBroker($credentials, $config);
 
     $this->statHat = new StatHat($settings['stathat_ez_key'], 'mbp-user-import:');
-    $this->statHat->setIsProduction(FALSE);
+    $this->statHat->setIsProduction(TRUE);
   }
 
   /*
