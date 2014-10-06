@@ -135,14 +135,17 @@ class MBP_UserImport
           $this->statHat->reportCount(1);
         }
       }
+
+      // Log activity
+      $this->logging($signupCount, $skipped, $targetCSVFileName);
+
+      // Archive file to prevent processing again and to backup to box.com
+      $this->archiveCSV($targetCSVFile);
     }
     else {
       trigger_error('Invalid file ' . $targetCSVFile, E_USER_WARNING);
       return FALSE;
     }
-
-    // Log activity
-    $this->logging($signupCount, $skipped, $targetCSVFileName);
 
     echo $signupCount . ' email addresses imported.' . $skipped . ' skipped.', "\n";
     echo '------- mbp-user-import->produceCSVImport() END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
@@ -193,6 +196,31 @@ class MBP_UserImport
     $importStat['source'] = 'niche.com';
     $payload = serialize($importStat);
     $mbUserImportLogging->publishMessage($payload);
+
+  }
+
+  /*
+   * Archive import files for long term / archive storage. In doing so rename/move
+   * the CSV file so mbp-user-import can run more than once a day an not process
+   * the same data file more than once.
+   *
+   * @param string $targetCSVFile
+   *   Total number of entries added to the queue.
+   */
+  private function archiveCSV($targetCSVFile) {
+
+    $targetCSVFile = __DIR__ . '/data/' . $targetCSVFile;
+    $processedCSVFile = __DIR__ . '/data/' . $targetCSVFile . '.' . time();
+    $archived = rename ($targetCSVFile, $processedCSVFile);
+
+    if ($archived) {
+      echo '-> mbp-user-import->archiveCSV(): ' . $targetCSVFile . ' archived.', "\n";
+
+      // @todo: Move file to box.com
+    }
+    else {
+      echo '-> ERROR: Failed to archive mbp-user-import->archiveCSV(): ' . $targetCSVFile . '.', "\n";
+    }
 
   }
 

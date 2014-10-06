@@ -1,0 +1,107 @@
+
+
+Importing user from niche.com
+
+-> Get CSV file from gmail (machines@dosomething.org)
+  - see Gleb for "K" password, download to local "downloads" directory. Example:
+$ pwd
+/Users/darrenlee/Downloads
+  
+2. upload CSV file to admin server
+$ scp -P 38383 2014-10-04.csv dosomething@10.241.0.21:/home/dosomething/2014-10-04.csv
+
+3. ssh to admin server
+$ ssh dosomething@admin.dosomething.org -p 38383
+
+4. transfer CSV file from admin to rabbit1
+-> via scp to rabbit1 -> /opt/rabbit/mbp-user-import
+
+$ scp 2014-10-04.csv dosomething@10.241.0.14:/opt/rabbit/mbp-user-import/data/2014-10-04.csv
+Password: "K"
+$ rm 2014-10-04.csv
+
+5. Upload CSV file to box.com account
+https://dosomething.app.box.com/files
+-> User Imports -> niche.com
+
+
+Done, wait for mbc-user-import to run via Jenkins every 2 hours, it will detect the presence of the upload csv file... or trigger in manually via the rabbit1 Jenkins dashboard: http://10.241.0.14:8080
+
+5a. When mbc-user-import is done processing there will be entries in the userImportQueue (check status in RabbitMQ Management dashboard: http://10.241.0.14:15672/#/queues). There will also be an entry in the import-summaries collection in the mb-logging database that logs the import file name and the number of user entries. This the result of an entry in the userImportExistingLoggingQueue which is consumed by mbc-import-logging resulting in a cURL call to mb-logging-api (app server) that makes an entry in the mb-logging database.
+
+dosomething@QAapps:~$ mongo
+MongoDB shell version: 2.4.9
+connecting to: test
+
+> show databases
+drupal-logging	0.203125GB
+ds-logging	(empty)
+ds-users	(empty)
+local	0.078125GB
+mailchimp-users	(empty)
+mb-campaigns	0.203125GB
+mb-logging	0.203125GB
+mb-users	3.9521484375GB
+mb-users-test	0.203125GB
+test	(empty)
+
+> use mb-logging
+switched to db mb-logging
+
+> show collections
+import-summaries
+system.indexes
+test
+userimport-niches
+
+> db['import-summaries'].find({target_CSV_file : "2014-10-04.csv"}).pretty()
+{
+	"target_CSV_file" : "2014-10-04.csv",
+	"signup_count" : 1863,
+	"skipped" : 0,
+	"source" : "niche.com",
+	"log_type" : "user_import",
+	"_id" : ObjectId("5430a26f7f7511605e328dff"),
+	"logged_date" : ISODate("2014-10-05T01:44:16Z"),
+	"__v" : 0
+}
+
+5b. When mbp-user-import is done it will start the mbc-user-import Jenkins job. This job does the following:
+  - Checks each userImportQueue entry to see if there's already a user entry in Mailchimp or Mobile Commons. If so, an entry is created in userImportExistingLoggingQueue resulting in a log entry in the mb-logging -> userimport-niches collection.
+  
+  - If a phone number is supplied by the niche.com submission that does not already exist, an entry in the mobileCommonsQueue that's consumed by mbc-registration-mobile is created resulting in a entry in Mobile Commons that's opted into the general optin path.
+    - If the number results in a "underlivable" response from Mobile Commons it's logged indicating the number is not a mobile number.
+  
+  - If an email address is supplied by the niche.com submission:
+    - A cURL request to the Drupal site to create a new user:
+        - Send a new user welcome email via transactionalQueue (mbc-transactional-email - Mandrill transaction) that has the temporary account password
+        - Send a welcome email detailing the connection to niche.com
+      - If the user exists
+        - Log the existance of the user (existing email) via userImportExistingLoggingQueue
+        - Only send the welcome email detailing the connection to niche.com
+    - The user details are sent to Mailchimp.
+      - If the email already exists a log entry is made in mb-logging
+      
+  - All of the user data is submitted to userAPIRegistrationQueue to create a user document in the mb-user database via mbc-userAPI-registration (mb-user-api).
+  
+5c. When mbc-user-import is done processing the mbp-logging-reports job is started resulting in an email report being generated detailing the daily results of the import including the existing users vs the new users. The report is sent to:
+  - dlee@dosomething.org
+  - mlidey@dosomething.org
+  - mholford@dosomething.org
+  - jbladt@dosomething.org
+  
+
+    
+    
+Things to note:
+
+  - When mbc-user-import is running you should see:
+    - All of the queue entries in userImportQueue moved to "Unacked" up to 5000 messages
+    - The transactionalQueue will become backed up in the Acked and if overloaded the Ready state. This is fine, it will processed until the queue is empty. The calls to Mandrill are slower than mbc-transactional-email processing the queue entries.
+    - The userRegistrationQueue will become backed up as the Mailchimp call is processed in batches of 200 every 10 minutes. This queue will slowly return to zero.
+    
+  - When mbp-logging-reports is done processing you can search for sent messages in Mandrill to any of the report emails once the transactionalQueue has returned to zero. The message will have a subject of "User Import Report - <report date>".
+  
+  
+
+
