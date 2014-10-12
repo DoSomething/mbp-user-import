@@ -210,19 +210,13 @@ class MBP_UserImport
   private function archiveCSV($targetCSVFile) {
 
     $processedCSVFile = $targetCSVFile . '.' . time();
-    $changedPermission = chmod($targetCSVFile, 0664);
-    if ($changedPermission) {
-      $archived = rename ($targetCSVFile, $processedCSVFile);
-      if ($archived) {
-        echo '-> mbp-user-import->archiveCSV(): ' . $targetCSVFile . ' archived.', "\n";
+    $archived = rename ($targetCSVFile, $processedCSVFile);
+    if ($archived) {
+      echo '-> mbp-user-import->archiveCSV(): ' . $targetCSVFile . ' archived.', "\n";
         // @todo: Move file to box.com
-      }
-      else {
-        echo '-> ERROR: Failed to archive mbp-user-import->archiveCSV(): ' . $targetCSVFile . '.', "\n";
-      }
     }
     else {
-      echo '-> ERROR: Failed to rename archive file: ' . $targetCSVFile . '. Import will be triggered again with presence of orginal CSV file.', "\n";
+      echo '-> ERROR: Failed to archive mbp-user-import->archiveCSV(): ' . $targetCSVFile . '. The file name needs to change to prevent further re-processing of the file on the next run of the script.', "\n";
     }
 
   }
