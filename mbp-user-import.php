@@ -63,14 +63,16 @@ $mbpUserImport = new MBP_UserImport($credentials, $config, $settings);
 
 // Collect targetCSV / targetUsers parameters
 if (isset($_GET['targetFile'])) {
-  $mbpUserImport->produceCSVImport($_GET['targetFile']);
+  $mbpUserImport->produceCSVImport($_GET['targetFile'], $_GET['source']);
 }
 elseif (isset($argv[1])) {
-  $mbpUserImport->produceCSVImport($argv[1]);
+  $mbpUserImport->produceCSVImport($argv[1], $argv[2]);
 }
+// Defaults
 else {
   $targetFile = date("Y-m-d") . '.csv';
-  if (file_exists(__DIR__ . '/data/' . $targetFile) == TRUE) {
+  $source = 'niche';
+  if (file_exists(__DIR__ . '/data/' . $source . '/' . $targetFile) == TRUE) {
     $mbpUserImport->produceCSVImport($targetFile);
   }
   else {
