@@ -71,8 +71,10 @@ class MBP_UserImport
    *
    * @param string $targetCSVFile
    *   The file name of the CSV file to import
+   * @param string $source
+   *   The source of the import data
    */
-  public function produceCSVImport($targetCSVFile) {
+  public function produceCSVImport($targetCSVFile, $source) {
 
     echo '------- mbp-user-import->produceCSVImport() START: ' . date('D M j G:i:s T Y') . ' -------', "\n";
 
@@ -85,15 +87,22 @@ class MBP_UserImport
     );
 
     $targetCSVFileName = $targetCSVFile;
-    $targetCSVFile = __DIR__ . '/data/' . $targetCSVFile;
+    $targetCSVFile = __DIR__ . '/data/' . $source . '/' . $targetCSVFile;
     // Was there a file found
     if (file_exists($targetCSVFile)) {
       $signups = file($targetCSVFile);
+
+      // Explode CSV data by line breaks
+      if (count($signups) == 1 && substr_count($signups[0], "\r") > 0) {
+        $signups = explode("\r", $signups[0]);
+      }
+
       foreach ($signups as $signupCount => $signup) {
 
         // Check that the coloumn assignment are as expected
-        if ($signupCount == 0 && $signup != "\"first_name\",\"last_name\",\"email\",\"address1\",\"address2\",\"city\",\"state\",\"zip\",\"phone\",\"hs_gradyear\",\"birthdate\",\"race\",\"religion\",\"hs_name\",\"college_name\",\"major_name\",\"degree_type\",\"sat_math\",\"sat_verbal\",\"sat_writing\",\"act_math\",\"act_english\",\"gpa\",\"role\"\r\n") {
-          echo 'Import columns are not as expected, halting import.', "\r";
+        // niche.com
+        if ($signupCount == 0 && $source == 'niche' && $signup != "\"first_name\",\"last_name\",\"email\",\"address1\",\"address2\",\"city\",\"state\",\"zip\",\"phone\",\"hs_gradyear\",\"birthdate\",\"race\",\"religion\",\"hs_name\",\"college_name\",\"major_name\",\"degree_type\",\"sat_math\",\"sat_verbal\",\"sat_writing\",\"act_math\",\"act_english\",\"gpa\",\"role\"\r\n") {
+          echo 'Import columns for ' . $source . ' are not as expected, halting import.', "\r";
           exit;
         }
 

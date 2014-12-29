@@ -55,17 +55,17 @@ $settings = array(
 );
 
 
-echo '------- mbp-user-import START: ' . date('D M j G:i:s T Y') . ' -------', "\n";
+echo '------- mbp-user-import START: ' . date('D M j G:i:s T Y') . ' -------', PHP_EOL;
 
 // Kick off
 // Create entries in userImportQueue based on csv.
 $mbpUserImport = new MBP_UserImport($credentials, $config, $settings);
 
 // Collect targetCSV / targetUsers parameters
-if (isset($_GET['targetFile'])) {
+if (isset($_GET['targetFile']) && isset($_GET['source'])) {
   $mbpUserImport->produceCSVImport($_GET['targetFile'], $_GET['source']);
 }
-elseif (isset($argv[1])) {
+elseif (isset($argv[1]) && isset($argv[2])) {
   $mbpUserImport->produceCSVImport($argv[1], $argv[2]);
 }
 // Defaults
@@ -76,9 +76,9 @@ else {
     $mbpUserImport->produceCSVImport($targetFile);
   }
   else {
-    echo 'targetFile not found in /data', "\n";
+    echo 'targetFile not found in /data/' . $source, PHP_EOL;
   }
 
 }
 
-echo '------- mbp-user-import END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
+echo '------- mbp-user-import END: ' . date('D M j G:i:s T Y') . ' -------', PHP_EOL;
