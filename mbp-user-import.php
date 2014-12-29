@@ -9,6 +9,8 @@
  * triggered by each entry.
  */
 
+date_default_timezone_set('America/New_York');
+
 // Load up the Composer autoload magic
 require_once __DIR__ . '/vendor/autoload.php';
 
