@@ -154,7 +154,7 @@ class MBP_UserImport
       }
 
       // Log activity
-      $this->logging($signupCount, $skipped, $targetCSVFileName);
+      $this->logging($signupCount, $skipped, $source, $targetCSVFileName);
 
       // Archive file to prevent processing again and to backup to box.com
       $this->archiveCSV($targetCSVFile);
@@ -177,10 +177,12 @@ class MBP_UserImport
    *   Total number of entries added to the queue.
    * @param integer $skipped
    *   Total number of entries skipped.
+   * @param string $source
+   *   The source to log for the import data.
    * @param string $targetCSVFile
    *   The file name of the CSV import file.
    */
-  private function logging($signupCount, $skipped, $targetCSVFile) {
+  private function logging($signupCount, $skipped, $source, $targetCSVFile) {
 
     $config = array(
       'exchange' => array(
@@ -208,7 +210,7 @@ class MBP_UserImport
     $importStat['signup-count'] = $signupCount;
     $importStat['skipped'] = $skipped;
     $importStat['log-timestamp'] = time();
-    $importStat['source'] = 'niche.com';
+    $importStat['source'] = $source;
     $payload = serialize($importStat);
     $mbUserImportLogging->publishMessage($payload);
 
