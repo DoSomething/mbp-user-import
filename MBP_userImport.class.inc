@@ -100,10 +100,16 @@ class MBP_UserImport
       foreach ($signups as $signupCount => $signup) {
 
         // Check that the coloumn assignment are as expected
-        // niche.com
-        if ($signupCount == 0 && $source == 'niche' && $signup != "\"first_name\",\"last_name\",\"email\",\"address1\",\"address2\",\"city\",\"state\",\"zip\",\"phone\",\"hs_gradyear\",\"birthdate\",\"race\",\"religion\",\"hs_name\",\"college_name\",\"major_name\",\"degree_type\",\"sat_math\",\"sat_verbal\",\"sat_writing\",\"act_math\",\"act_english\",\"gpa\",\"role\"\r\n") {
-          echo 'Import columns for ' . $source . ' are not as expected, halting import.', "\r";
-          exit;
+        if ($signupCount == 0) {
+
+          if (($source == 'niche' &&
+               $signup != "\"first_name\",\"last_name\",\"email\",\"address1\",\"address2\",\"city\",\"state\",\"zip\",\"phone\",\"hs_gradyear\",\"birthdate\",\"race\",\"religion\",\"hs_name\",\"college_name\",\"major_name\",\"degree_type\",\"sat_math\",\"sat_verbal\",\"sat_writing\",\"act_math\",\"act_english\",\"gpa\",\"role\"\r\n") ||
+             ($source == 'herCampus' &&
+              $signup != "entry_id,first_name,last_name,email,phone")) {
+
+            echo 'Import columns for ' . $source . ' are not as expected, halting import.', "\r";
+            exit;
+          }
         }
 
         // Clean up first
@@ -116,12 +122,14 @@ class MBP_UserImport
         }
         else {
           $signupData = explode(',', $signup);
-          
+
           $data = array();
           $data = array(
             'subscribed' => 1,
             'activity_timestamp' => time(),
             'application_id' => 100, // Import
+            'source' => $source,
+            'source_file' => $targetCSVFileName
           );
           foreach ($signupKeys as $signupIndex => $signupKey) {
             if (isset($signupData[$signupIndex]) && $signupData[$signupIndex] != '') {
@@ -167,10 +175,8 @@ class MBP_UserImport
    *
    * @param integer $signupCount
    *   Total number of entries added to the queue.
-   *
    * @param integer $skipped
    *   Total number of entries skipped.
-   *
    * @param string $targetCSVFile
    *   The file name of the CSV import file.
    */
