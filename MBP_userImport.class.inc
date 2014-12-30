@@ -71,8 +71,10 @@ class MBP_UserImport
    *
    * @param string $targetCSVFile
    *   The file name of the CSV file to import
+   * @param string $source
+   *   The source of the import data
    */
-  public function produceCSVImport($targetCSVFile) {
+  public function produceCSVImport($targetCSVFile, $source) {
 
     echo '------- mbp-user-import->produceCSVImport() START: ' . date('D M j G:i:s T Y') . ' -------', "\n";
 
@@ -85,16 +87,29 @@ class MBP_UserImport
     );
 
     $targetCSVFileName = $targetCSVFile;
-    $targetCSVFile = __DIR__ . '/data/' . $targetCSVFile;
+    $targetCSVFile = __DIR__ . '/data/' . $source . '/' . $targetCSVFile;
     // Was there a file found
     if (file_exists($targetCSVFile)) {
       $signups = file($targetCSVFile);
+
+      // Explode CSV data by line breaks
+      if (count($signups) == 1 && substr_count($signups[0], "\r") > 0) {
+        $signups = explode("\r", $signups[0]);
+      }
+
       foreach ($signups as $signupCount => $signup) {
 
         // Check that the coloumn assignment are as expected
-        if ($signupCount == 0 && $signup != "\"first_name\",\"last_name\",\"email\",\"address1\",\"address2\",\"city\",\"state\",\"zip\",\"phone\",\"hs_gradyear\",\"birthdate\",\"race\",\"religion\",\"hs_name\",\"college_name\",\"major_name\",\"degree_type\",\"sat_math\",\"sat_verbal\",\"sat_writing\",\"act_math\",\"act_english\",\"gpa\",\"role\"\r\n") {
-          echo 'Import columns are not as expected, halting import.', "\r";
-          exit;
+        if ($signupCount == 0) {
+
+          if (($source == 'niche' &&
+               $signup != "\"first_name\",\"last_name\",\"email\",\"address1\",\"address2\",\"city\",\"state\",\"zip\",\"phone\",\"hs_gradyear\",\"birthdate\",\"race\",\"religion\",\"hs_name\",\"college_name\",\"major_name\",\"degree_type\",\"sat_math\",\"sat_verbal\",\"sat_writing\",\"act_math\",\"act_english\",\"gpa\",\"role\"\r\n") ||
+             ($source == 'herCampus' &&
+              $signup != "entry_id,first_name,last_name,email,phone")) {
+
+            echo 'Import columns for ' . $source . ' are not as expected, halting import.', "\r";
+            exit;
+          }
         }
 
         // Clean up first
@@ -107,12 +122,14 @@ class MBP_UserImport
         }
         else {
           $signupData = explode(',', $signup);
-          
+
           $data = array();
           $data = array(
             'subscribed' => 1,
             'activity_timestamp' => time(),
             'application_id' => 100, // Import
+            'source' => $source,
+            'source_file' => $targetCSVFileName
           );
           foreach ($signupKeys as $signupIndex => $signupKey) {
             if (isset($signupData[$signupIndex]) && $signupData[$signupIndex] != '') {
@@ -137,7 +154,7 @@ class MBP_UserImport
       }
 
       // Log activity
-      $this->logging($signupCount, $skipped, $targetCSVFileName);
+      $this->logging($signupCount, $skipped, $source, $targetCSVFileName);
 
       // Archive file to prevent processing again and to backup to box.com
       $this->archiveCSV($targetCSVFile);
@@ -158,14 +175,14 @@ class MBP_UserImport
    *
    * @param integer $signupCount
    *   Total number of entries added to the queue.
-   *
    * @param integer $skipped
    *   Total number of entries skipped.
-   *
+   * @param string $source
+   *   The source to log for the import data.
    * @param string $targetCSVFile
    *   The file name of the CSV import file.
    */
-  private function logging($signupCount, $skipped, $targetCSVFile) {
+  private function logging($signupCount, $skipped, $source, $targetCSVFile) {
 
     $config = array(
       'exchange' => array(
@@ -193,7 +210,7 @@ class MBP_UserImport
     $importStat['signup-count'] = $signupCount;
     $importStat['skipped'] = $skipped;
     $importStat['log-timestamp'] = time();
-    $importStat['source'] = 'niche.com';
+    $importStat['source'] = $source;
     $payload = serialize($importStat);
     $mbUserImportLogging->publishMessage($payload);
 
