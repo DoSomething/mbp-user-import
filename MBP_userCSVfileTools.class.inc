@@ -1,5 +1,8 @@
 <?php
 
+use Ddeboer\Imap\SearchExpression;
+use Ddeboer\Imap\Search\Email\FromAddress;
+use Ddeboer\Imap\Server;
 use DoSomething\MBStatTracker\StatHat;
 
 /**
@@ -49,22 +52,46 @@ class MBP_userCSVfileTools
   public function gatherIMAP() {
 
     echo '------- mbp-user-import_manageData->gatherIMAP() START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
-    
-    
-$bla = FALSE;
-if ($bla) {
-  $bla = TRUE;
-}
 
-    $server = new \Fetch\Server('imap.gmail.com', 993);
-    $server->setAuthentication('machines@dosomething.org', 'ChomskyMastiffBronchial194');
+    $existingFiles = scandir(__DIR__ . '/data/niche');
+    unset($existingFiles[0]);
+    unset($existingFiles[1]);
 
-    $messages = $server->getMessages();
-    /** @var $message \Fetch\Message */
-    foreach ($messages as $message) {
-      echo "Subject: {$message->getSubject()}\nBody: {$message->getMessageBody()}\n";
+    $search = new SearchExpression();
+    $search->addCondition(new FromAddress('mike@niche.com'));
+
+    $server = new Server('imap.gmail.com');
+    $connection = $server->authenticate('machines@dosomething.org', 'ChomskyMastiffBronchial194');
+
+    $mailboxes = $connection->getMailboxes();
+    foreach ($mailboxes as $mailbox) {
+      if ($mailbox->getName() == 'INBOX') {
+
+        $messages = $mailbox->getMessages($search);
+        foreach ($messages as $message) {
+          if ($message->getSubject() == 'Niche-DoSomething Daily Co-reg File') {
+
+            $attachments = $message->getAttachments();
+            foreach ($attachments as $attachment) {
+
+              if (file_exists(__DIR__ . '/data/niche/' . $attachment->getFilename()) == FALSE) {
+
+                foreach ($existingFiles as $existingCount => $existingFile) {
+                  if (strpos($existingFile, $attachment->getFilename()) !== FALSE) {
+                    break 2;
+                  }
+                }
+                echo $attachment->getFilename() . ' retrieved from gmail account.', PHP_EOL;
+                file_put_contents(__DIR__ . '/data/niche/' . $attachment->getFilename(), $attachment->getDecodedContent());
+              }
+
+            }
+
+          }
+        }
+
+      }
     }
-
 
     echo '------- mbp-user-import_manageData->gatherIMAP() END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
