@@ -13,21 +13,21 @@ class MBP_userCSVfileTools
 {
 
   /**
-   * Setting from external services - Mailchimp.
+   * Setting from external services - Gmail.
    *
    * @var array
    */
   private $settings;
 
   /**
-   * Setting from external services - Mailchimp.
+   * Logging script activity.
    *
-   * @var array
+   * @var object
    */
   private $statHat;
 
   /**
-   * Constructor for MBC_UserEvent
+   * Constructor for MBP_userCSVfileTools
    *
    * @param array $credentials
    *   Secret settings from mb-secure-config.inc

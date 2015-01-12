@@ -1,12 +1,9 @@
 <?php
 /**
- * mbp-user-import.php
+ * mbp-user-import_manageData.php
  *
- * Import user data from CSV file supplied by niche.com of users interested in
- * DoSomething scholarships. Entries in the userImportQueue will be consumed by
- * mbc-user-import consumer. User creation in the Drupal website as well as the
- * userAPI, Mailchimp and Mandrill transactional signup email message will be
- * triggered by each entry.
+ * Collect user import data from gmail account as CSV attachment files. Save
+ * the file in data directory to be detercted by import script for processing.
  */
 
 date_default_timezone_set('America/New_York');
@@ -16,9 +13,9 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 // Load configuration settings common to the Message Broker system
 // symlinks in the project directory point to the actual location of the files
-require __DIR__ . '/mb-secure-config.inc';
+require_once __DIR__ . '/mb-secure-config.inc';
 
-require __DIR__ . '/MBP_userCSVfileTools.class.inc';
+require_once __DIR__ . '/MBP_userCSVfileTools.class.inc';
 
 $settings = array(
   'stathat_ez_key' => getenv("STATHAT_EZKEY")
