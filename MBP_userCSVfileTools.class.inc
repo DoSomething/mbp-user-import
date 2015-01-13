@@ -1,14 +1,15 @@
 <?php
+/**
+ * MBP_userCSVfileTools - functionality related to the Message Broker
+ * producer mbp-user-import to coordinate CSV files.
+ */
 
 use Ddeboer\Imap\SearchExpression;
 use Ddeboer\Imap\Search\Email\FromAddress;
 use Ddeboer\Imap\Server;
 use DoSomething\MBStatTracker\StatHat;
 
-/**
- * MBP_UserImport class - functionality related to the Message Broker
- * producer mbp-user-import.
- */
+
 class MBP_userCSVfileTools
 {
 
@@ -61,7 +62,7 @@ class MBP_userCSVfileTools
     $search->addCondition(new FromAddress('mike@niche.com'));
 
     $server = new Server('imap.gmail.com');
-    $connection = $server->authenticate('machines@dosomething.org', 'ChomskyMastiffBronchial194');
+    $connection = $server->authenticate($this->settings['gmail_machine_username'], $this->settings['gmail_machine_password']);
 
     $mailboxes = $connection->getMailboxes();
     foreach ($mailboxes as $mailbox) {

@@ -18,7 +18,9 @@ require_once __DIR__ . '/mb-secure-config.inc';
 require_once __DIR__ . '/MBP_userCSVfileTools.class.inc';
 
 $settings = array(
-  'stathat_ez_key' => getenv("STATHAT_EZKEY")
+  'stathat_ez_key' => getenv("STATHAT_EZKEY"),
+  'gmail_machine_username' => getenv("GMAIL_MACHINE_USERNAME"),
+  'gmail_machine_password' => getenv("GMAIL_MACHINE_PASSWORD"),
 );
 
 
