@@ -161,6 +161,7 @@ class MBP_UserImport
     }
     else {
       trigger_error('Invalid file ' . $targetCSVFile, E_USER_WARNING);
+      echo 'ERROR - ' . $targetCSVFile . ' file not fount.', PHP_EOL;
       return FALSE;
     }
 
