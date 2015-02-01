@@ -73,10 +73,10 @@ else {
   $targetFile = date("Y-m-d") . '.csv';
   $source = 'niche';
   if (file_exists(__DIR__ . '/data/' . $source . '/' . $targetFile) == TRUE) {
-    $mbpUserImport->produceCSVImport($targetFile);
+    $mbpUserImport->produceCSVImport($targetFile, $source);
   }
   else {
-    echo 'targetFile not found in /data/' . $source, PHP_EOL;
+    echo 'targetFile not found in /data/' . $source . '/' . $targetFile, PHP_EOL;
   }
 
 }
