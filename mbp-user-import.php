@@ -57,28 +57,34 @@ $settings = array(
 
 echo '------- mbp-user-import START: ' . date('D M j G:i:s T Y') . ' -------', PHP_EOL;
 
-// Kick off
-// Create entries in userImportQueue based on csv.
-$mbpUserImport = new MBP_UserImport($credentials, $config, $settings);
+$targetFile = '*';
+if (isset($_GET['targetFile'])) {
+  $targetFile = $_GET['targetFile'];
+}
+elseif (isset($argv[1])) {
+  $targetFile = $argv[1];
+}
 
-// Collect targetCSV / targetUsers parameters
-if (isset($_GET['targetFile']) && isset($_GET['source'])) {
-  $mbpUserImport->produceCSVImport($_GET['targetFile'], $_GET['source']);
+$allowedSources = array(
+  'niche',
+  'hercampus',
+  'att-ichannel'
+);
+
+$source = NULL;
+if (isset($_GET['source'])) {
+  $source = $_GET['source'];
 }
-elseif (isset($argv[1]) && isset($argv[2])) {
-  $mbpUserImport->produceCSVImport($argv[1], $argv[2]);
+elseif (isset($argv[2])) {
+  $source = $argv[2];
 }
-// Defaults
+
+if (in_array($source, $allowedSources)) {
+  $mbpUserImport = new MBP_UserImport($credentials, $config, $settings);
+  $mbpUserImport->produceCSVImport($targetFile, $source);
+}
 else {
-  $targetFile = date("Y-m-d") . '.csv';
-  $source = 'niche';
-  if (file_exists(__DIR__ . '/data/' . $source . '/' . $targetFile) == TRUE) {
-    $mbpUserImport->produceCSVImport($targetFile, $source);
-  }
-  else {
-    echo 'targetFile not found in /data/' . $source . '/' . $targetFile, PHP_EOL;
-  }
-
+  echo 'ERROR - invalid source.', PHP_EOL;
 }
 
 echo '------- mbp-user-import END: ' . date('D M j G:i:s T Y') . ' -------', PHP_EOL;
