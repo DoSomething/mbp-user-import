@@ -27,8 +27,16 @@ $settings = array(
 echo '------- mbp-user-import_manageData START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
 // Kick off
-// Gather CSV from possible sources
-$mbpUserCSVfileTools = new MBP_userCSVfileTools($settings);
-$status = $mbpUserCSVfileTools->gatherIMAP();
+
+// Collect targetCSV / targetUsers parameters
+if (isset($_GET['source'])) {
+  $status = $mbpUserCSVfileTools->gatherIMAP($_GET['source']);
+}
+elseif (isset($argv[1])) {
+  $status = $mbpUserCSVfileTools->gatherIMAP($argv[1]);
+}
+else {
+  echo '"source" not defined as the first parameter.', PHP_EOL;
+}
 
 echo '------- mbp-user-import_manageData  END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
