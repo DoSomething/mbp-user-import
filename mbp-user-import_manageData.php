@@ -27,16 +27,32 @@ $settings = array(
 echo '------- mbp-user-import_manageData START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
 // Kick off
+$allowedSources = array(
+  'niche',
+  'hercampus',
+  'att-ichannel'
+);
 
-// Collect targetCSV / targetUsers parameters
+$source = NULL;
 if (isset($_GET['source'])) {
-  $status = $mbpUserCSVfileTools->gatherIMAP($_GET['source']);
+  $source = $_GET['source'];
 }
 elseif (isset($argv[1])) {
-  $status = $mbpUserCSVfileTools->gatherIMAP($argv[1]);
+  $source = $argv[1];
+}
+
+if ($source != NULL)  {
+
+  if (inarray($source, $allowedSources)) {
+    $status = $mbpUserCSVfileTools->gatherIMAP($source);
+  }
+  else {
+    echo '', PHP_EOL;
+  }
+
 }
 else {
-  echo '"source" not defined as the first parameter.', PHP_EOL;
+  echo '"source" parameter not defined.', PHP_EOL;
 }
 
 echo '------- mbp-user-import_manageData  END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
