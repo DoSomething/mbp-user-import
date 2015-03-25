@@ -47,19 +47,34 @@ class MBP_userCSVfileTools
   /*
    * Gather CSV file from gmail
    *
-   * @param string $targetDate
-   *   The date of the desired CSV data
+   * @param string $source
+   *   The target source. Currentl supports "niche" and "att-ichannel"
    */
-  public function gatherIMAP() {
+  public function gatherIMAP($source) {
 
     echo '------- mbp-user-import_manageData->gatherIMAP() START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
-    $existingFiles = scandir(__DIR__ . '/data/niche');
+    $targetSourceDetails = array(
+      'niche' => array(
+        'from' => 'mike@niche.com',
+        'subject' => 'Niche-DoSomething Daily Co-reg File',
+      ),
+      'hercampus' => array(
+        'from' => '',
+        'subject' => '',
+      ),
+      'att-ichannel' => array(
+        'from' => '',
+        'subject' => 'AT&T U-Verse DoSomething Fulfillment File',
+      ),
+    );
+
+    $existingFiles = scandir(__DIR__ . '/data/' . $source);
     unset($existingFiles[0]);
     unset($existingFiles[1]);
 
     $search = new SearchExpression();
-    $search->addCondition(new FromAddress('mike@niche.com'));
+    $search->addCondition(new FromAddress($targetSourceDetails[$source]['from']));
 
     $server = new Server('imap.gmail.com');
     $connection = $server->authenticate($this->settings['gmail_machine_username'], $this->settings['gmail_machine_password']);
@@ -70,12 +85,12 @@ class MBP_userCSVfileTools
 
         $messages = $mailbox->getMessages($search);
         foreach ($messages as $message) {
-          if ($message->getSubject() == 'Niche-DoSomething Daily Co-reg File') {
+          if ($message->getSubject() == $targetSourceDetails[$source]['subject']) {
 
             $attachments = $message->getAttachments();
             foreach ($attachments as $attachment) {
 
-              if (file_exists(__DIR__ . '/data/niche/' . $attachment->getFilename()) == FALSE) {
+              if (file_exists(__DIR__ . '/data/' . $source . '/' . $attachment->getFilename()) == FALSE) {
 
                 foreach ($existingFiles as $existingCount => $existingFile) {
                   if (strpos($existingFile, $attachment->getFilename()) !== FALSE) {
@@ -83,12 +98,13 @@ class MBP_userCSVfileTools
                   }
                 }
                 echo $attachment->getFilename() . ' retrieved from gmail account.', PHP_EOL;
-                file_put_contents(__DIR__ . '/data/niche/' . $attachment->getFilename(), $attachment->getDecodedContent());
+                file_put_contents(__DIR__ . '/data/' . $source . '/' . $attachment->getFilename(), $attachment->getDecodedContent());
               }
 
             }
 
           }
+
         }
 
       }
