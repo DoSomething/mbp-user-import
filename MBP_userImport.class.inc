@@ -86,9 +86,15 @@ class MBP_UserImport
       'drupal' => 0
     );
 
-    $targetCSVFileName = $targetCSVFile;
-    $targetCSVFile = __DIR__ . '/data/' . $source . '/' . $targetCSVFile;
-    // Was there a file found
+    if ($targetCSVFile == '*') {
+      $targetCSVFile = $this->findNextTargetFile($source);
+    }
+    else {
+      $targetCSVFileName = $targetCSVFile;
+      $targetCSVFile = __DIR__ . '/data/' . $source . '/' . $targetCSVFile;
+    }
+
+    // Is there a file found?
     if (file_exists($targetCSVFile)) {
       $signups = file($targetCSVFile);
 
@@ -168,6 +174,21 @@ class MBP_UserImport
     echo $signupCount . ' email addresses imported.' . $skipped . ' skipped.', "\n";
     echo '------- mbp-user-import->produceCSVImport() END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
 
+  }
+
+  /*
+   * Gather next file name to process based on the define source..
+   *
+   * @param string $source
+   *   The name of the source, used to define which directory to search for the
+   *   next file available to be processed.
+   *
+   * @return string $targetCSVFile
+   *   The name of the file to process.
+   */
+  private function findNextTargetFile() {
+
+    return $targetCSVFile;
   }
 
   /*
