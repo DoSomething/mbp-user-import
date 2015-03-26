@@ -43,7 +43,7 @@ elseif (isset($argv[1])) {
 
 if ($source != NULL)  {
 
-  if (inarray($source, $allowedSources)) {
+  if (in_array($source, $allowedSources)) {
     $status = $mbpUserCSVfileTools->gatherIMAP($source);
   }
   else {
