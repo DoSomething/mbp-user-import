@@ -95,7 +95,7 @@ class MBP_UserImport
     }
 
     // Is there a file found?
-    if (file_exists($targetCSVFile)) {
+    if ($targetCSVFile != FALSE && file_exists($targetCSVFile)) {
       $signups = file($targetCSVFile);
 
       // Explode CSV data by line breaks
@@ -108,14 +108,25 @@ class MBP_UserImport
         // Check that the coloumn assignment are as expected
         if ($signupCount == 0) {
 
-          if (($source == 'niche' &&
-               $signup != "\"first_name\",\"last_name\",\"email\",\"address1\",\"address2\",\"city\",\"state\",\"zip\",\"phone\",\"hs_gradyear\",\"birthdate\",\"race\",\"religion\",\"hs_name\",\"college_name\",\"major_name\",\"degree_type\",\"sat_math\",\"sat_verbal\",\"sat_writing\",\"act_math\",\"act_english\",\"gpa\",\"role\"\r\n") ||
-             ($source == 'herCampus' &&
-              $signup != "entry_id,first_name,last_name,email,phone")) {
+          switch ($source) {
+            case 'niche':
+              $columns = "\"first_name\",\"last_name\",\"email\",\"address1\",\"address2\",\"city\",\"state\",\"zip\",\"phone\",\"hs_gradyear\",\"birthdate\",\"race\",\"religion\",\"hs_name\",\"college_name\",\"major_name\",\"degree_type\",\"sat_math\",\"sat_verbal\",\"sat_writing\",\"act_math\",\"act_english\",\"gpa\",\"role\"\r\n";
+              break;
 
-            echo 'Import columns for ' . $source . ' are not as expected, halting import.', "\r";
-            exit;
+            case 'hercampus':
+              $columns = "entry_id,first_name,last_name,email,phone";
+              break;
+
+            case 'att-ichannel':
+              // HDR,65204,03/28/2015 03:55:38,DOSOMETHING.ORG,,,,,,,,,,,,,,,,,,,
+              // TRL,,END OF FILE,,,,,,,,,,,,,,,,,,,,
+              $columns = 'HDR,*,*,DOSOMETHING.ORG,,,,,,,,,,,,,,,,,,,';
+              break;
+
+            default:
+              echo 'produceCSVImport(): Undefined source. ', PHP_EOL;
           }
+
         }
 
         // Clean up first
@@ -186,7 +197,21 @@ class MBP_UserImport
    * @return string $targetCSVFile
    *   The name of the file to process.
    */
-  private function findNextTargetFile() {
+  private function findNextTargetFile($source) {
+
+    $targetCSVFile = FALSE;
+    $targetCSVDir = __DIR__ . '/data/' . $source;
+    $files = scandir($targetCSVDir);
+
+    // Target next file that ends in ".csv"
+    foreach ($files as $file) {
+      $csvPosition = strpos($file, '.csv');
+      $fileLength = strlen($file) - 4;
+      if ($csvPosition == $fileLength) {
+       $targetCSVFile = $targetCSVDir . '/' . $file;
+        break;
+      }
+    }
 
     return $targetCSVFile;
   }
