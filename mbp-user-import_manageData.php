@@ -44,6 +44,7 @@ elseif (isset($argv[1])) {
 if ($source != NULL)  {
 
   if (in_array($source, $allowedSources)) {
+    $mbpUserCSVfileTools = new MBP_userCSVfileTools($settings);
     $status = $mbpUserCSVfileTools->gatherIMAP($source);
   }
   else {
