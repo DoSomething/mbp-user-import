@@ -60,11 +60,11 @@ class MBP_userCSVfileTools
         'subject' => 'Niche-DoSomething Daily Co-reg File',
       ),
       'hercampus' => array(
-        'from' => '',
-        'subject' => '',
+        'from' => 'chelseaevans@hercampus.com',
+        'subject' => 'Comeback Clothes + Her Campus',
       ),
       'att-ichannel' => array(
-        'from' => '',
+        'from' => 'p1ia1c1@klph070.kcdc.att.com',
         'subject' => 'AT&T U-Verse DoSomething Fulfillment File',
       ),
     );
