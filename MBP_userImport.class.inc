@@ -240,7 +240,7 @@ class MBP_UserImport
       return FALSE;
     }
 
-    echo $signupCount . ' email addresses imported.' . $skipped . ' skipped.', "\n";
+    echo $imported . ' email addresses imported.' . $skipped . ' skipped.', "\n";
     echo '------- mbp-user-import->produceCSVImport() END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
 
   }
