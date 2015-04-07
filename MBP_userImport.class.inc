@@ -87,7 +87,7 @@ class MBP_UserImport
       'drupal' => 0
     );
 
-    if ($targetCSVFile == '*') {
+    if ($targetCSVFile == 'nextFile') {
       $targetCSVFile = $this->findNextTargetFile($source);
       $targetFilePaths = explode('/', $targetCSVFile);
       $targetCSVFileName = $targetFilePaths[count($targetFilePaths) - 1];
