@@ -78,6 +78,7 @@ class MBP_UserImport
 
     echo '------- mbp-user-import->produceCSVImport() START: ' . date('D M j G:i:s T Y') . ' -------', "\n";
 
+    $imported = 0;
     $skipped = 0;
     $signupKeys = array();
     $existingStatus = array(
@@ -217,6 +218,7 @@ class MBP_UserImport
             $payload = json_encode($data);
             $status = $this->messageBroker->publishMessage($payload);
             $this->statHat->addStatName('produceCSVImport');
+            $imported++;
           }
           elseif ($signupCount < count($signups) - 1) {
             $skipped++;
@@ -227,7 +229,7 @@ class MBP_UserImport
       }
 
       // Log activity
-      $this->logging($signupCount, $skipped, $source, $targetCSVFileName);
+      $this->logging($imported, $skipped, $source, $targetCSVFileName);
 
       // Archive file to prevent processing again and to backup to box.com
       $this->archiveCSV($targetCSVFile);
