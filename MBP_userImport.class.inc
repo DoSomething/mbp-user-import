@@ -88,6 +88,8 @@ class MBP_UserImport
 
     if ($targetCSVFile == '*') {
       $targetCSVFile = $this->findNextTargetFile($source);
+      $targetFilePaths = explode('/', $targetCSVFile);
+      $targetCSVFileName = $targetFilePaths[count($targetFilePaths) - 1];
     }
     else {
       $targetCSVFileName = $targetCSVFile;
@@ -103,42 +105,96 @@ class MBP_UserImport
         $signups = explode("\r", $signups[0]);
       }
 
-      foreach ($signups as $signupCount => $signup) {
+      $totalSignups = count($signups);
+      for ($signupCount = 0; $signupCount <= $totalSignups; $signupCount++) {
 
         // Check that the coloumn assignment are as expected
         if ($signupCount == 0) {
 
           switch ($source) {
             case 'niche':
-              $columns = "\"first_name\",\"last_name\",\"email\",\"address1\",\"address2\",\"city\",\"state\",\"zip\",\"phone\",\"hs_gradyear\",\"birthdate\",\"race\",\"religion\",\"hs_name\",\"college_name\",\"major_name\",\"degree_type\",\"sat_math\",\"sat_verbal\",\"sat_writing\",\"act_math\",\"act_english\",\"gpa\",\"role\"\r\n";
+
+              $signupKeys = array (
+                'first_name',
+                'last_name',
+                'email',
+                'address1',
+                'address2',
+                'city',
+                'state',
+                'zip',
+                'phone',
+                'hs_gradyear',
+                'birthdate',
+                'race',
+                'religion',
+                'hs_name',
+                'college_name',
+                'major_name',
+                'degree_type',
+                'sat_math',
+                'sat_verbal',
+                'sat_writing',
+                'act_math',
+                'act_english',
+                'gpa',
+                'role',
+              );
               break;
 
             case 'hercampus':
-              $columns = "entry_id,first_name,last_name,email,phone";
+
+              $signupKeys = array (
+                'entry_id',
+                'first_name',
+                'last_name',
+                'email',
+                'phone',
+              );
               break;
 
             case 'att-ichannel':
-              // HDR,65204,03/28/2015 03:55:38,DOSOMETHING.ORG,,,,,,,,,,,,,,,,,,,
-              // TRL,,END OF FILE,,,,,,,,,,,,,,,,,,,,
-              $columns = 'HDR,*,*,DOSOMETHING.ORG,,,,,,,,,,,,,,,,,,,';
+
+              // DTL,03/18/2015 16:33:01,kimberly Xxx,1234567890,xxx@att.com
+              // ATTR,Date of Birth,12061988
+              $signupKeys = array (
+                'name',
+                'phone',
+                'email',
+                'birthdate',
+              );
               break;
 
             default:
               echo 'produceCSVImport(): Undefined source. ', PHP_EOL;
+              exit;
           }
 
         }
-
-        // Clean up first
-        $signup = str_replace('"', '',  $signup);
-        $signup = str_replace("\r\n", '',  $signup);
-
-        // The first row (zero index) defines the column names
-        if ($signupCount == 0) {
-           $signupKeys = explode(',', $signup);
-        }
         else {
-          $signupData = explode(',', $signup);
+
+          if ($source == 'att-ichannel') {
+
+            // Combine DTL and ATTR rows
+            $signupsATTR = explode(',', $signups[$signupCount + 1]);
+            $birthdate = substr($signupsATTR[2], 0, 2) . '/' . substr($signupsATTR[2], 2, 2) . '/' . substr($signupsATTR[2], 4, 4);
+            $signup = $signups[$signupCount] . ',' . $birthdate;
+            $signup = str_replace("\r\n", '',   $signup);
+            $signupData = explode(',', $signup);
+
+            // Remove column heading and creation date
+            unset($signupData[0]);
+            unset($signupData[1]);
+            $signupData = array_values($signupData);
+
+            $signupCount++;
+          }
+          else {
+            $signup = $signups[$signupCount];
+            $signup = str_replace('"', '',  $signup);
+            $signup = str_replace("\r\n", '',  $signup);
+            $signupData = explode(',', $signup);
+          }
 
           $data = array();
           $data = array(
@@ -148,6 +204,7 @@ class MBP_UserImport
             'source' => $source,
             'source_file' => $targetCSVFileName
           );
+
           foreach ($signupKeys as $signupIndex => $signupKey) {
             if (isset($signupData[$signupIndex]) && $signupData[$signupIndex] != '') {
               $data[$signupKey] = $signupData[$signupIndex];
@@ -157,7 +214,6 @@ class MBP_UserImport
           // Required
           $this->statHat->clearAddedStatNames();
           if (isset($data['email']) && $data['email'] != '') {
-
             $payload = json_encode($data);
             $status = $this->messageBroker->publishMessage($payload);
             $this->statHat->addStatName('produceCSVImport');
