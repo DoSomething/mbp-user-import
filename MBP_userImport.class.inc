@@ -176,17 +176,22 @@ class MBP_UserImport
 
           if ($source == 'att-ichannel') {
 
-            // Combine DTL and ATTR rows
-            $signupsATTR = explode(',', $signups[$signupCount + 1]);
-            $birthdate = substr($signupsATTR[2], 0, 2) . '/' . substr($signupsATTR[2], 2, 2) . '/' . substr($signupsATTR[2], 4, 4);
-            $signup = $signups[$signupCount] . ',' . $birthdate;
-            $signup = str_replace("\r\n", '',   $signup);
-            $signupData = explode(',', $signup);
+            // Skip the last line - END OF FILE
+            if (isset( $signups[$signupCount + 1])) {
 
-            // Remove column heading and creation date
-            unset($signupData[0]);
-            unset($signupData[1]);
-            $signupData = array_values($signupData);
+              // Combine DTL and ATTR rows
+              $signupsATTR = explode(',', $signups[$signupCount + 1]);
+              $birthdate = substr($signupsATTR[2], 0, 2) . '/' . substr($signupsATTR[2], 2, 2) . '/' . substr($signupsATTR[2], 4, 4);
+              $signup = $signups[$signupCount] . ',' . $birthdate;
+              $signup = str_replace("\r\n", '',   $signup);
+              $signupData = explode(',', $signup);
+
+              // Remove column heading and creation date
+              unset($signupData[0]);
+              unset($signupData[1]);
+              $signupData = array_values($signupData);
+
+            }
 
             $signupCount++;
           }
@@ -212,8 +217,9 @@ class MBP_UserImport
             }
           }
 
-          // Required
           $this->statHat->clearAddedStatNames();
+
+          // Required
           if (isset($data['email']) && $data['email'] != '') {
             $payload = json_encode($data);
             $status = $this->messageBroker->publishMessage($payload);
