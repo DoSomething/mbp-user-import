@@ -57,7 +57,7 @@ $settings = array(
 
 echo '------- mbp-user-import START: ' . date('D M j G:i:s T Y') . ' -------', PHP_EOL;
 
-$targetFile = '*';
+$targetFile = 'nextFile';
 if (isset($_GET['targetFile'])) {
   $targetFile = $_GET['targetFile'];
 }
