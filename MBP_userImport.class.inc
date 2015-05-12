@@ -146,7 +146,7 @@ class MBP_UserImport
             case 'hercampus':
 
               $signupKeys = array (
-                'entry_id',
+                // 'entry_id',
                 'first_name',
                 'last_name',
                 'email',
