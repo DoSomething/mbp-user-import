@@ -76,7 +76,7 @@ class MBP_UserImport
    */
   public function produceCSVImport($targetCSVFile, $source) {
 
-    echo '------- mbp-user-import->produceCSVImport() START: ' . date('D M j G:i:s T Y') . ' -------', "\n";
+    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' START: ' . date('D M j G:i:s T Y') . ' -------', "\n";
 
     $imported = 0;
     $skipped = 0;
@@ -106,7 +106,7 @@ class MBP_UserImport
         $signups = explode("\r", $signups[0]);
       }
 
-      $totalSignups = count($signups);
+      $totalSignups = count($signups) - 1;
       for ($signupCount = 0; $signupCount <= $totalSignups; $signupCount++) {
 
         // Check that the coloumn assignment are as expected
@@ -163,6 +163,23 @@ class MBP_UserImport
                 'phone',
                 'email',
                 'birthdate',
+              );
+              break;
+
+            case 'teenlife':
+
+              $signupKeys = array (
+                'first_name',
+                'last_name',
+                'email',
+                'zip_code',
+                'mobile_number',
+                'member_type',
+                'graduation_year',
+                'birthdate',
+                'member_source',
+                'conversion_date',
+                'conversion_page',
               );
               break;
 
@@ -247,7 +264,7 @@ class MBP_UserImport
     }
 
     echo $imported . ' email addresses imported.' . $skipped . ' skipped.', "\n";
-    echo '------- mbp-user-import->produceCSVImport() END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
+    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
 
   }
 
