@@ -63,7 +63,7 @@ class MBP_UserImport
     $this->messageBroker = new MessageBroker($credentials, $config);
 
     $this->statHat = new StatHat($settings['stathat_ez_key'], 'mbp-user-import:');
-    $this->statHat->setIsProduction(TRUE);
+    $this->statHat->setIsProduction($settings['use_stathat_tracking'] ? $settings['use_stathat_tracking'] : FALSE);
   }
 
   /*
@@ -106,7 +106,7 @@ class MBP_UserImport
         $signups = explode("\r", $signups[0]);
       }
 
-      $totalSignups = count($signups) - 1;
+      $totalSignups = count($signups);
       for ($signupCount = 0; $signupCount <= $totalSignups; $signupCount++) {
 
         // Check that the coloumn assignment are as expected
