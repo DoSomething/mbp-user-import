@@ -63,7 +63,7 @@ class MBP_UserImport
     $this->messageBroker = new MessageBroker($credentials, $config);
 
     $this->statHat = new StatHat($settings['stathat_ez_key'], 'mbp-user-import:');
-    $this->statHat->setIsProduction($settings['use_stathat_tracking'] ? $settings['use_stathat_tracking'] : FALSE);
+    $this->statHat->setIsProduction(isset($settings['use_stathat_tracking']) ? $settings['use_stathat_tracking'] : FALSE);
   }
 
   /*
@@ -106,7 +106,7 @@ class MBP_UserImport
         $signups = explode("\r", $signups[0]);
       }
 
-      $totalSignups = count($signups);
+      $totalSignups = count($signups) - 1;
       for ($signupCount = 0; $signupCount <= $totalSignups; $signupCount++) {
 
         // Check that the coloumn assignment are as expected
@@ -243,7 +243,7 @@ class MBP_UserImport
             $this->statHat->addStatName('produceCSVImport');
             $imported++;
           }
-          elseif ($signupCount < count($signups) - 1) {
+          elseif ($signupCount < count($signups)) {
             $skipped++;
             $this->statHat->addStatName('skippedCSVImport - invalid email');
           }
