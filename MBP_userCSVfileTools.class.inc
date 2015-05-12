@@ -52,7 +52,7 @@ class MBP_userCSVfileTools
    */
   public function gatherIMAP($source) {
 
-    echo '------- mbp-user-import_manageData->gatherIMAP() START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
+    echo '------- mbp-user-import_manageData->gatherIMAP() ** ' . $source . ' ** START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
     $targetSourceDetails = array(
       'niche' => array(
@@ -66,6 +66,10 @@ class MBP_userCSVfileTools
       'att-ichannel' => array(
         'from' => 'p1ia1c1@klph070.kcdc.att.com',
         'subject' => 'AT&T U-Verse DoSomething Fulfillment File',
+      ),
+      'teenlife' => array(
+        'from' => 'stephanie@teenlife.com',
+        'subject' => 'TeenLife + DoSomething.org Co-Marketing',
       ),
     );
 
@@ -110,7 +114,7 @@ class MBP_userCSVfileTools
       }
     }
 
-    echo '------- mbp-user-import_manageData->gatherIMAP() END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
+    echo '------- mbp-user-import_manageData->gatherIMAP() ** ' . $source . ' ** END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
   }
 
