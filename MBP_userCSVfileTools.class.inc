@@ -41,7 +41,7 @@ class MBP_userCSVfileTools
     $this->settings = $settings;
 
     $this->statHat = new StatHat($settings['stathat_ez_key'], 'mbp-user-import:');
-    $this->statHat->setIsProduction(TRUE);
+    $this->statHat->setIsProduction(isset($settings['use_stathat_tracking']) ? $settings['use_stathat_tracking'] : FALSE);
   }
 
   /*
