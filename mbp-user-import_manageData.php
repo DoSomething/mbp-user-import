@@ -13,8 +13,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 // Load configuration settings common to the Message Broker system
 // symlinks in the project directory point to the actual location of the files
-require_once __DIR__ . '/mb-secure-config.inc';
-
+require_once __DIR__ . '/messagebroker-config/mb-secure-config.inc';
 require_once __DIR__ . '/MBP_userCSVfileTools.class.inc';
 
 $settings = array(
