@@ -16,6 +16,7 @@
         "php": ">= 5.3.0",
         "DoSomething/messagebroker-phplib": "0.2.*",
         "ddeboer/imap": "0.5.*",
+        "dosomething/mb-toolbox": "0.4.*",
         "dosomething/mb-stat-tracker": "v0.0.3"
     },
     "require-dev": {
