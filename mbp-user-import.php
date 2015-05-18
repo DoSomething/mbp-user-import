@@ -13,13 +13,14 @@ date_default_timezone_set('America/New_York');
 
 // Load up the Composer autoload magic
 require_once __DIR__ . '/vendor/autoload.php';
+use DoSomething\MB_Toolbox\MB_Configuration;
 
 // Load configuration settings common to the Message Broker system
 // symlinks in the project directory point to the actual location of the files
-require __DIR__ . '/mb-secure-config.inc';
-require __DIR__ . '/mb-config.inc';
-
-require __DIR__ . '/MBP_userImport.class.inc';
+// Load configuration settings common to the Message Broker system
+// symlinks in the project directory point to the actual location of the files
+require_once __DIR__ . '/messagebroker-config/mb-secure-config.inc';
+require_once __DIR__ . '/MBP_userImport.class.inc';
 
 // Settings
 $credentials = array(
@@ -30,28 +31,30 @@ $credentials = array(
   'vhost' => getenv("RABBITMQ_VHOST"),
 );
 
-$config = array(
-  'exchange' => array(
-    'name' => getenv("MB_USER_IMPORT_EXCHANGE"),
-    'type' => getenv("MB_USER_IMPORT_EXCHANGE_TYPE"),
-    'passive' => getenv("MB_USER_IMPORT_EXCHANGE_PASSIVE"),
-    'durable' => getenv("MB_USER_IMPORT_EXCHANGE_DURABLE"),
-    'auto_delete' => getenv("MB_USER_IMPORT_EXCHANGE_AUTO_DELETE"),
-  ),
-  'queue' => array(
-    array(
-      'name' => getenv("MB_USER_IMPORT_QUEUE"),
-      'passive' => getenv("MB_USER_IMPORT_QUEUE_PASSIVE"),
-      'durable' => getenv("MB_USER_IMPORT_QUEUE_DURABLE"),
-      'exclusive' => getenv("MB_USER_IMPORT_QUEUE_EXCLUSIVE"),
-      'auto_delete' => getenv("MB_USER_IMPORT_QUEUE_AUTO_DELETE"),
-      'bindingKey' => getenv("MB_USER_IMPORT_QUEUE_BINDING_KEY"),
-    ),
-  ),
-  'routingKey' => getenv("MB_USER_IMPORT_ROUTING_KEY"),
-);
 $settings = array(
-  'stathat_ez_key' => getenv("STATHAT_EZKEY")
+  'stathat_ez_key' => getenv("STATHAT_EZKEY"),
+  'use_stathat_tracking' => getenv('USE_STAT_TRACKING'),
+);
+
+$config = array();
+$source = __DIR__ . '/messagebroker-config/mb_config.json';
+$mb_config = new MB_Configuration($source, $settings);
+$userImportExchange = $mb_config->exchangeSettings('directUserImport');
+
+$config['exchange'] = array(
+  'name' => $userImportExchange->name,
+  'type' => $userImportExchange->type,
+  'passive' => $userImportExchange->passive,
+  'durable' => $userImportExchange->durable,
+  'auto_delete' => $userImportExchange->auto_delete,
+);
+$config['queue'][] = array(
+  'name' => $userImportExchange->queues->userImportQueue->name,
+  'passive' => $userImportExchange->queues->userImportQueue->passive,
+  'durable' =>  $userImportExchange->queues->userImportQueue->durable,
+  'exclusive' =>  $userImportExchange->queues->userImportQueue->exclusive,
+  'auto_delete' =>  $userImportExchange->queues->userImportQueue->auto_delete,
+  'bindingKey' => $userImportExchange->queues->userImportQueue->binding_key,
 );
 
 
