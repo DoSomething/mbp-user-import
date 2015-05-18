@@ -41,22 +41,26 @@ $source = __DIR__ . '/messagebroker-config/mb_config.json';
 $mb_config = new MB_Configuration($source, $settings);
 $userImportExchange = $mb_config->exchangeSettings('directUserImport');
 
-$config['exchange'] = array(
-  'name' => $userImportExchange->name,
-  'type' => $userImportExchange->type,
-  'passive' => $userImportExchange->passive,
-  'durable' => $userImportExchange->durable,
-  'auto_delete' => $userImportExchange->auto_delete,
+$config = array(
+  'exchange' => array(
+    'name' => $userImportExchange->name,
+    'type' => $userImportExchange->type,
+    'passive' => $userImportExchange->passive,
+    'durable' => $userImportExchange->durable,
+    'auto_delete' => $userImportExchange->auto_delete,
+  ),
+  'queue' => array(
+    array(
+      'name' => $userImportExchange->queues->userImportQueue->name,
+      'passive' => $userImportExchange->queues->userImportQueue->passive,
+      'durable' =>  $userImportExchange->queues->userImportQueue->durable,
+      'exclusive' =>  $userImportExchange->queues->userImportQueue->exclusive,
+      'auto_delete' =>  $userImportExchange->queues->userImportQueue->auto_delete,
+      'bindingKey' => $userImportExchange->queues->userImportQueue->binding_key,
+    ),
+  ),
+  'routingKey' => $userImportExchange->queues->userImportQueue->routing_key,
 );
-$config['queue'][] = array(
-  'name' => $userImportExchange->queues->userImportQueue->name,
-  'passive' => $userImportExchange->queues->userImportQueue->passive,
-  'durable' =>  $userImportExchange->queues->userImportQueue->durable,
-  'exclusive' =>  $userImportExchange->queues->userImportQueue->exclusive,
-  'auto_delete' =>  $userImportExchange->queues->userImportQueue->auto_delete,
-  'bindingKey' => $userImportExchange->queues->userImportQueue->binding_key,
-);
-
 
 echo '------- mbp-user-import START: ' . date('D M j G:i:s T Y') . ' -------', PHP_EOL;
 
