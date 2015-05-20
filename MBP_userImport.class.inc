@@ -1,5 +1,6 @@
 <?php
 
+use DoSomething\MB_Toolbox\MB_Configuration;
 use DoSomething\MBStatTracker\StatHat;
 
 /**
@@ -312,22 +313,26 @@ class MBP_UserImport
    */
   private function logging($signupCount, $skipped, $source, $targetCSVFile) {
 
+    $source = __DIR__ . '/messagebroker-config/mb_config.json';
+    $mbConfig = new MB_Configuration($source, $this->settings);
+    $userImportExistingLoggingExchange = $mbConfig->exchangeSettings('directUserImportExistingLogging');
+
     $config = array(
       'exchange' => array(
-        'name' => getenv("MB_USER_IMPORT_LOGGING_EXCHANGE"),
-        'type' => getenv("MB_USER_IMPORT_LOGGING_EXCHANGE_TYPE"),
-        'passive' => getenv("MB_USER_IMPORT_LOGGING_EXCHANGE_PASSIVE"),
-        'durable' => getenv("MB_USER_IMPORT_LOGGING_EXCHANGE_DURABLE"),
-        'auto_delete' => getenv("MB_USER_IMPORT_LOGGING_EXCHANGE_AUTO_DELETE"),
+        'name' => $userImportExistingLoggingExchange->name,
+        'type' => $userImportExistingLoggingExchange->type,
+        'passive' => $userImportExistingLoggingExchange->passive,
+        'durable' => $userImportExistingLoggingExchange->durable,
+        'auto_delete' => $userImportExistingLoggingExchange->auto_delete,
       ),
       'queue' => array(
-        'user_import' => array(
-          'name' => getenv("MB_USER_IMPORT_LOGGING_QUEUE"),
-          'passive' => getenv("MB_USER_IMPORT_LOGGING_QUEUE_PASSIVE"),
-          'durable' => getenv("MB_USER_IMPORT_LOGGING_QUEUE_DURABLE"),
-          'exclusive' => getenv("MB_USER_IMPORT_LOGGING_QUEUE_EXCLUSIVE"),
-          'auto_delete' => getenv("MB_USER_IMPORT_LOGGING_QUEUE_AUTO_DELETE"),
-          'bindingKey' => getenv("MB_USER_IMPORT_LOGGING_QUEUE_TOPIC_MB_TRANSACTIONAL_EXCHANGE_PATTERN"),
+        array(
+          'name' => $userImportExistingLoggingExchange->queues->userImportExistingLoggingQueue->name,
+          'passive' => $userImportExistingLoggingExchange->queues->userImportExistingLoggingQueue->passive,
+          'durable' =>  $userImportExistingLoggingExchange->queues->userImportExistingLoggingQueue->durable,
+          'exclusive' =>  $userImportExistingLoggingExchange->queues->userImportExistingLoggingQueue->exclusive,
+          'auto_delete' =>  $userImportExistingLoggingExchange->queues->userImportExistingLoggingQueue->auto_delete,
+          'bindingKey' => $userImportExistingLoggingExchange->queues->userImportExistingLoggingQueue->binding_key,
         ),
       ),
     );
