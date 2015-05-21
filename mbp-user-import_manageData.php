@@ -18,6 +18,7 @@ require_once __DIR__ . '/MBP_userCSVfileTools.class.inc';
 
 $settings = array(
   'stathat_ez_key' => getenv("STATHAT_EZKEY"),
+  'use_stathat_tracking' => getenv('USE_STAT_TRACKING'),
   'gmail_machine_username' => getenv("GMAIL_MACHINE_USERNAME"),
   'gmail_machine_password' => getenv("GMAIL_MACHINE_PASSWORD"),
 );
