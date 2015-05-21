@@ -313,8 +313,8 @@ class MBP_UserImport
    */
   private function logging($signupCount, $skipped, $source, $targetCSVFile) {
 
-    $source = __DIR__ . '/messagebroker-config/mb_config.json';
-    $mbConfig = new MB_Configuration($source, $this->settings);
+    $configSource = __DIR__ . '/messagebroker-config/mb_config.json';
+    $mbConfig = new MB_Configuration($configSource, $this->settings);
     $userImportExistingLoggingExchange = $mbConfig->exchangeSettings('directUserImportExistingLogging');
 
     $config = array(
