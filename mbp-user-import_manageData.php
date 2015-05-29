@@ -10,11 +10,11 @@ date_default_timezone_set('America/New_York');
 
 // Load up the Composer autoload magic
 require_once __DIR__ . '/vendor/autoload.php';
+use DoSomething\MBP_UserImport\MBP_UserImport\MBP_userCSVfileTools;
 
 // Load configuration settings common to the Message Broker system
 // symlinks in the project directory point to the actual location of the files
 require_once __DIR__ . '/messagebroker-config/mb-secure-config.inc';
-require_once __DIR__ . '/MBP_userCSVfileTools.class.inc';
 
 $settings = array(
   'stathat_ez_key' => getenv("STATHAT_EZKEY"),
