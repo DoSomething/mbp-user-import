@@ -4,6 +4,7 @@
  * producer mbp-user-import to coordinate CSV files.
  */
 
+namespace DoSomething\MBP_UserImport;
 use Ddeboer\Imap\SearchExpression;
 use Ddeboer\Imap\Search\Email\FromAddress;
 use Ddeboer\Imap\Server;

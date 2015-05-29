@@ -1,5 +1,6 @@
 <?php
 
+namespace DoSomething\MBP_UserImport;
 use DoSomething\MB_Toolbox\MB_Configuration;
 use DoSomething\MBStatTracker\StatHat;
 
