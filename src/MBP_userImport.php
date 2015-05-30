@@ -1,8 +1,13 @@
 <?php
+/**
+ * MBP_UserImport - class to manage importing user data via CSV files to the
+ * Message Broker system.
+ */
 
 namespace DoSomething\MBP_UserImport;
+
 use DoSomething\MB_Toolbox\MB_Configuration;
-use DoSomething\StatHat\Client\StatHat;
+use DoSomething\StatHat\Client as StatHat;
 
 /**
  * MBP_UserImport class - functionality related to the Message Broker
@@ -10,7 +15,7 @@ use DoSomething\StatHat\Client\StatHat;
  */
 class MBP_UserImport
 {
-  
+
   /**
    * Message Broker object that details the connection to RabbitMQ.
    *
@@ -62,12 +67,13 @@ class MBP_UserImport
     $this->settings = $settings;
 
     // Setup RabbitMQ connection
-    $this->messageBroker = new MessageBroker($credentials, $config);
+    $this->messageBroker = new \MessageBroker($credentials, $config);
 
     $this->statHat = new StatHat([
       'ez_key' => $settings['stathat_ez_key'],
       'debug' => $settings['stathat_disable_tracking']
     ]);
+
   }
 
   /*
