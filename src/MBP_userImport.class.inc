@@ -2,7 +2,7 @@
 
 namespace DoSomething\MBP_UserImport;
 use DoSomething\MB_Toolbox\MB_Configuration;
-use DoSomething\MBStatTracker\StatHat;
+use DoSomething\StatHat\Client\StatHat;
 
 /**
  * MBP_UserImport class - functionality related to the Message Broker
@@ -64,8 +64,10 @@ class MBP_UserImport
     // Setup RabbitMQ connection
     $this->messageBroker = new MessageBroker($credentials, $config);
 
-    $this->statHat = new StatHat($settings['stathat_ez_key'], 'mbp-user-import:');
-    $this->statHat->setIsProduction(isset($settings['use_stathat_tracking']) ? $settings['use_stathat_tracking'] : FALSE);
+    $this->statHat = new StatHat([
+      'ez_key' => $settings['stathat_ez_key'],
+      'debug' => $settings['stathat_disable_tracking']
+    ]);
   }
 
   /*
@@ -236,20 +238,17 @@ class MBP_UserImport
             }
           }
 
-          $this->statHat->clearAddedStatNames();
-
           // Required
           if (isset($data['email']) && $data['email'] != '') {
             $payload = json_encode($data);
             $status = $this->messageBroker->publishMessage($payload);
-            $this->statHat->addStatName('produceCSVImport');
+            $this->statHat->ezCount('mbp-user-import: produceCSVImport', 1);
             $imported++;
           }
           elseif ($signupCount < count($signups)) {
             $skipped++;
-            $this->statHat->addStatName('skippedCSVImport - invalid email');
+            $this->statHat->ezCount('mbp-user-import: skippedCSVImport - invalid email', 1);
           }
-          $this->statHat->reportCount(1);
         }
       }
 
