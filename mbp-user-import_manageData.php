@@ -18,7 +18,7 @@ require_once __DIR__ . '/messagebroker-config/mb-secure-config.inc';
 
 $settings = array(
   'stathat_ez_key' => getenv("STATHAT_EZKEY"),
-  'use_stathat_tracking' => getenv('USE_STAT_TRACKING'),
+  'stathat_disable_tracking' => getenv('DISABLE_STAT_TRACKING'),
   'gmail_machine_username' => getenv("GMAIL_MACHINE_USERNAME"),
   'gmail_machine_password' => getenv("GMAIL_MACHINE_PASSWORD"),
 );
