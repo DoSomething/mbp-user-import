@@ -41,8 +41,10 @@ class MBP_userCSVfileTools
 
     $this->settings = $settings;
 
-    $this->statHat = new StatHat($settings['stathat_ez_key'], 'mbp-user-import:');
-    $this->statHat->setIsProduction(isset($settings['use_stathat_tracking']) ? $settings['use_stathat_tracking'] : FALSE);
+    $this->statHat = new StatHat([
+      'ez_key' => $settings['stathat_ez_key'],
+      'debug' => $settings['stathat_disable_tracking']
+    ]);
   }
 
   /*
@@ -104,6 +106,7 @@ class MBP_userCSVfileTools
                 }
                 echo $attachment->getFilename() . ' retrieved from gmail account.', PHP_EOL;
                 file_put_contents(__DIR__ . '/data/' . $source . '/' . $attachment->getFilename(), $attachment->getDecodedContent());
+                $this->statHat->ezCount('mbp-user-import_manageData: ' . $source, 1);
               }
 
             }
