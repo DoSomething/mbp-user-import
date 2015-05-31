@@ -104,7 +104,7 @@ class MBP_UserImport
     }
     else {
       $targetCSVFileName = $targetCSVFile;
-      $targetCSVFile = __DIR__ . '/data/' . $source . '/' . $targetCSVFile;
+      $targetCSVFile = __DIR__ . '/../data/' . $source . '/' . $targetCSVFile;
     }
 
     // Is there a file found?
@@ -285,7 +285,7 @@ class MBP_UserImport
    * @return string $targetCSVFile
    *   The name of the file to process.
    */
-  private function findNextTargetFile($source) {
+  public function findNextTargetFile($source) {
 
     $targetCSVFile = FALSE;
     $targetCSVDir = __DIR__ . '/data/' . $source;
