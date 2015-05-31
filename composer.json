@@ -1,5 +1,5 @@
 {
-  "name": "https://github.com/DoSomething/mbp-user-import",
+  "name": "mbp-user-import",
   "type": "project",
   "version": "0.3.0",
   "description": "A producer app for the Message Broker system that imports users from niche.com that have expressed an interest in DoSomething scholorships.",
@@ -15,6 +15,7 @@
   "require": {
     "php": ">= 5.3.0",
     "DoSomething/messagebroker-phplib": "0.2.*",
+    "ddeboer/imap": "0.5.*",
     "dosomething/mb-toolbox": "0.4.*",
     "dosomething/stathat": "1.*"
   },
