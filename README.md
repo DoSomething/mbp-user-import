@@ -13,6 +13,10 @@ The work flow of the user import process is:
 Installation
 ----------
 **Production**
-- `$ composer install`
+- `$ composer install --no-dev`
 **Development**
-- `*composer install --no-dev`
+- `*composer install --dev`
+
+Update
+----------
+- `$ composer update`
