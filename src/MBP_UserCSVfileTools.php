@@ -11,7 +11,7 @@ use Ddeboer\Imap\Server;
 use DoSomething\MBStatTracker\StatHat;
 
 
-class MBP_userCSVfileTools
+class MBP_UserCSVfileTools
 {
 
   /**
