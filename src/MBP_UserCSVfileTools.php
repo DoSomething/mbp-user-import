@@ -5,10 +5,11 @@
  */
 
 namespace DoSomething\MBP_UserImport;
+
 use Ddeboer\Imap\SearchExpression;
 use Ddeboer\Imap\Search\Email\FromAddress;
 use Ddeboer\Imap\Server;
-use DoSomething\MBStatTracker\StatHat;
+use DoSomething\StatHat\Client as StatHat;
 
 
 class MBP_UserCSVfileTools
