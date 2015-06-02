@@ -288,7 +288,7 @@ class MBP_UserImport
   public function findNextTargetFile($source) {
 
     $targetCSVFile = FALSE;
-    $targetCSVDir = __DIR__ . '/data/' . $source;
+    $targetCSVDir = __DIR__ . '/../data/' . $source;
     $files = scandir($targetCSVDir);
 
     // Target next file that ends in ".csv"
@@ -319,7 +319,7 @@ class MBP_UserImport
    */
   private function logging($signupCount, $skipped, $source, $targetCSVFile) {
 
-    $configSource = __DIR__ . '/messagebroker-config/mb_config.json';
+    $configSource = __DIR__ . '/../messagebroker-config/mb_config.json';
     $mbConfig = new MB_Configuration($configSource, $this->settings);
     $userImportExistingLoggingExchange = $mbConfig->exchangeSettings('directUserImportExistingLogging');
 
