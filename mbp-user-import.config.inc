@@ -26,8 +26,8 @@ $settings = array(
 );
 
 $config = array();
-$source = __DIR__ . '/messagebroker-config/mb_config.json';
-$mb_config = new MB_Configuration($source, $settings);
+$configSource = __DIR__ . '/messagebroker-config/mb_config.json';
+$mb_config = new MB_Configuration($configSource, $settings);
 $userImportExchange = $mb_config->exchangeSettings('directUserImport');
 
 $config = array(
