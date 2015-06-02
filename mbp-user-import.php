@@ -17,7 +17,7 @@ use DoSomething\MBP_UserImport\MBP_UserImport;
 
 require_once __DIR__ . '/mbp-user-import.config.inc';
 
-echo '------- mbp-user-import START: ' . date('D M j G:i:s T Y') . ' -------', PHP_EOL;
+echo '------- mbp-user-import START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
 $targetFile = 'nextFile';
 if (isset($_GET['targetFile'])) {
@@ -42,12 +42,19 @@ elseif (isset($argv[2])) {
   $source = $argv[2];
 }
 
-if (in_array($source, $allowedSources)) {
-  $mbpUserImport = new MBP_UserImport($credentials, $config, $settings);
-  $mbpUserImport->produceCSVImport($targetFile, $source);
+if ($source != NULL)  {
+
+  if (in_array($source, $allowedSources)) {
+    $mbpUserImport = new MBP_UserImport($credentials, $config, $settings);
+    $mbpUserImport->produceCSVImport($targetFile, $source);
+  }
+  else {
+    echo 'ERROR - invalid source.', PHP_EOL;
+  }
+
 }
 else {
-  echo 'ERROR - invalid source.', PHP_EOL;
+  echo '"source" parameter not defined.', PHP_EOL;
 }
 
-echo '------- mbp-user-import END: ' . date('D M j G:i:s T Y') . ' -------', PHP_EOL;
+echo '------- mbp-user-import END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
