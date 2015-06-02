@@ -77,7 +77,7 @@ class MBP_UserCSVfileTools
       ),
     );
 
-    $existingFiles = scandir(__DIR__ . '/data/' . $source);
+    $existingFiles = scandir(__DIR__ . '/../data/' . $source);
     unset($existingFiles[0]);
     unset($existingFiles[1]);
 
@@ -98,7 +98,7 @@ class MBP_UserCSVfileTools
             $attachments = $message->getAttachments();
             foreach ($attachments as $attachment) {
 
-              if (file_exists(__DIR__ . '/data/' . $source . '/' . $attachment->getFilename()) == FALSE) {
+              if (file_exists(__DIR__ . '/../data/' . $source . '/' . $attachment->getFilename()) == FALSE) {
 
                 foreach ($existingFiles as $existingCount => $existingFile) {
                   if (strpos($existingFile, $attachment->getFilename()) !== FALSE) {
@@ -106,7 +106,7 @@ class MBP_UserCSVfileTools
                   }
                 }
                 echo $attachment->getFilename() . ' retrieved from gmail account.', PHP_EOL;
-                file_put_contents(__DIR__ . '/data/' . $source . '/' . $attachment->getFilename(), $attachment->getDecodedContent());
+                file_put_contents(__DIR__ . '/../data/' . $source . '/' . $attachment->getFilename(), $attachment->getDecodedContent());
                 $this->statHat->ezCount('mbp-user-import_manageData: ' . $source, 1);
               }
 
