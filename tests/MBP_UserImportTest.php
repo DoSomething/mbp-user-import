@@ -1,6 +1,12 @@
 <?php
  
 use DoSomething\MBP_UserImport\MBP_UserImport;
+
+    // Including that file will also return the autoloader instance, so you can store
+    // the return value of the include call in a variable and add more namespaces.
+    // This can be useful for autoloading classes in a test suite, for example.
+    // https://getcomposer.org/doc/01-basic-usage.md
+    $loader = require_once __DIR__ . '/../vendor/autoload.php';
  
 class MBP_UserImportTest extends PHPUnit_Framework_TestCase {
   
@@ -11,12 +17,6 @@ class MBP_UserImportTest extends PHPUnit_Framework_TestCase {
   {
     
     date_default_timezone_set('America/New_York');
-
-    // Including that file will also return the autoloader instance, so you can store
-    // the return value of the include call in a variable and add more namespaces.
-    // This can be useful for autoloading classes in a test suite, for example.
-    // https://getcomposer.org/doc/01-basic-usage.md
-    $loader = require_once __DIR__ . '/../vendor/autoload.php';
 
     // Load Message Broker settings used mb mbp-user-import.php
     require_once __DIR__ . '/../mbp-user-import.config.inc';
@@ -34,12 +34,18 @@ class MBP_UserImportTest extends PHPUnit_Framework_TestCase {
     );
     
     foreach ($sources as $source) {
-      $targetCSVFile = $mbpUserImport->findNextTargetFile($source);
-      echo 'targetCSVFile: ' . $targetCSVFile, PHP_EOL;
       
-      // If *.csv file exists, confirm valid data file is found for each source
-      $foundCSVFile = TRUE;
-      $this->assertTrue($foundCSVFile);
+      // Create temporary file "00-test.csv" in each of the source directories
+      $testFile = __DIR__ . '/../data/' . $source . '/00-test.csv';
+      $testFileStatus = touch($testFile);
+      $targetCSVFile = $mbpUserImport->findNextTargetFile($source);
+      
+      $testNameLoc = strpos($targetCSVFile, '00-test.csv');
+      $this->assertGreaterThan(0, $testNameLoc);
+      
+      // Remove the test file
+      $this->assertTrue(unlink($testFile));
+      
     }
 
   }
