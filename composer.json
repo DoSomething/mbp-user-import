@@ -26,5 +26,20 @@
     "psr-4": {
       "DoSomething\\MBP_UserImport\\": "src/"
     }
+  },
+  "scripts": {
+    "pre-package-install": [
+      "./bin/install.sh"
+    ],
+    "post-package-install": [
+      "./vendor/bin/phpunit"
+    ],
+    "post-package-update": [
+      "./vendor/bin/phpunit"
+    ],
+    "post-package-uninstall": [
+      "./bin/uninstall.sh"
+    ]
   }
+
 }
