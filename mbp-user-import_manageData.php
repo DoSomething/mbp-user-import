@@ -12,7 +12,7 @@ date_default_timezone_set('America/New_York');
 require_once __DIR__ . '/vendor/autoload.php';
 use DoSomething\MBP_UserImport\MBP_UserCSVfileTools;
 
-require_once __DIR__ . '/mbp-user-import.config_manageData.inc';
+require_once __DIR__ . '/mbp-user-import_manageData.config.inc';
 
 
 echo '------- mbp-user-import_manageData START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
