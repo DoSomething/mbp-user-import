@@ -343,7 +343,7 @@ class MBP_UserImport
       ),
     );
     $config['routingKey'] = $userImportExistingLoggingExchange->queues->userImportExistingLoggingQueue->routing_key;
-    $mbUserImportLogging = new MessageBroker($this->credentials, $config);
+    $mbUserImportLogging = new \MessageBroker($this->credentials, $config);
 
     $importStat['log-type'] = 'file-import';
     $importStat['target-CSV-file'] = $targetCSVFile;
