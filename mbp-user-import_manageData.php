@@ -10,18 +10,9 @@ date_default_timezone_set('America/New_York');
 
 // Load up the Composer autoload magic
 require_once __DIR__ . '/vendor/autoload.php';
-use DoSomething\MBP_UserImport\MBP_UserImport\MBP_UserCSVfileTools;
+use DoSomething\MBP_UserImport\MBP_UserCSVfileTools;
 
-// Load configuration settings common to the Message Broker system
-// symlinks in the project directory point to the actual location of the files
-require_once __DIR__ . '/messagebroker-config/mb-secure-config.inc';
-
-$settings = array(
-  'stathat_ez_key' => getenv("STATHAT_EZKEY"),
-  'stathat_disable_tracking' => getenv('DISABLE_STAT_TRACKING'),
-  'gmail_machine_username' => getenv("GMAIL_MACHINE_USERNAME"),
-  'gmail_machine_password' => getenv("GMAIL_MACHINE_PASSWORD"),
-);
+require_once __DIR__ . '/mbp-user-import.config_manageData.inc';
 
 
 echo '------- mbp-user-import_manageData START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
@@ -49,7 +40,7 @@ if ($source != NULL)  {
     $status = $mbpUserCSVfileTools->gatherIMAP($source);
   }
   else {
-    echo '', PHP_EOL;
+    echo 'ERROR - invalid source.', PHP_EOL;
   }
 
 }
