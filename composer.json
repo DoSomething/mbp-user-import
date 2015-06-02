@@ -29,6 +29,7 @@
   },
   "scripts": {
     "pre-package-install": [
+      "sudo su dosomething",
       "./bin/install.sh"
     ],
     "post-package-install": [
@@ -38,6 +39,7 @@
       "./vendor/bin/phpunit"
     ],
     "post-package-uninstall": [
+      "sudo su dosomething",
       "./bin/uninstall.sh"
     ]
   }
