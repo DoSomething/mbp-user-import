@@ -35,6 +35,10 @@
     "post-package-install": [
       "./vendor/bin/phpunit"
     ],
+    "pre-package-update": [
+      "git checkout master",
+      "git pull"
+    ],
     "post-package-update": [
       "./vendor/bin/phpunit"
     ],

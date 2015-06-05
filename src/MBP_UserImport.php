@@ -86,7 +86,7 @@ class MBP_UserImport
    */
   public function produceCSVImport($targetCSVFile, $source) {
 
-    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' START: ' . date('D M j G:i:s T Y') . ' -------', "\n";
+    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' START: ' . date('j D M Y G:i:s T') . ' -------', "\n";
 
     $imported = 0;
     $skipped = 0;
@@ -271,7 +271,7 @@ class MBP_UserImport
     }
 
     echo $imported . ' email addresses imported.' . $skipped . ' skipped.', "\n";
-    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
+    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('j D M Y G:i:s T') . ' -------', "\n";
 
   }
 
