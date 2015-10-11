@@ -61,7 +61,7 @@ class MBP_UserCSVfileTools
     $targetSourceDetails = array(
       'niche' => array(
         'from' => 'mike@niche.com',
-        'subject' => 'Niche-DoSomething Daily Co-reg File',
+        'subject' => 'Niche-DoSomething Daily Co-regs',
       ),
       'hercampus' => array(
         'from' => 'chelseaevans@hercampus.com',
