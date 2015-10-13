@@ -60,7 +60,7 @@ class MBP_UserCSVfileTools
 
     $targetSourceDetails = array(
       'niche' => array(
-        'from' => 'mike@niche.com',
+        'from' => '	no-reply@batchrobot.com',
         'subject' => 'Niche-DoSomething Daily Co-regs',
       ),
       'hercampus' => array(
