@@ -321,28 +321,28 @@ class MBP_UserImport
 
     $configSource = __DIR__ . '/../messagebroker-config/mb_config.json';
     $mbConfig = new MB_Configuration($configSource, $this->settings);
-    $userImportExistingLoggingExchange = $mbConfig->exchangeSettings('directUserImportExistingLogging');
-
+    $loggingGatewayExchange = $mbConfig->exchangeSettings('directLoggingGateway');
     $config = array(
       'exchange' => array(
-        'name' => $userImportExistingLoggingExchange->name,
-        'type' => $userImportExistingLoggingExchange->type,
-        'passive' => $userImportExistingLoggingExchange->passive,
-        'durable' => $userImportExistingLoggingExchange->durable,
-        'auto_delete' => $userImportExistingLoggingExchange->auto_delete,
+        'name' => $loggingGatewayExchange->name,
+        'type' => $loggingGatewayExchange->type,
+        'passive' => $loggingGatewayExchange->passive,
+        'durable' => $loggingGatewayExchange->durable,
+        'auto_delete' => $loggingGatewayExchange->auto_delete,
       ),
       'queue' => array(
         array(
-          'name' => $userImportExistingLoggingExchange->queues->userImportExistingLoggingQueue->name,
-          'passive' => $userImportExistingLoggingExchange->queues->userImportExistingLoggingQueue->passive,
-          'durable' =>  $userImportExistingLoggingExchange->queues->userImportExistingLoggingQueue->durable,
-          'exclusive' =>  $userImportExistingLoggingExchange->queues->userImportExistingLoggingQueue->exclusive,
-          'auto_delete' =>  $userImportExistingLoggingExchange->queues->userImportExistingLoggingQueue->auto_delete,
-          'bindingKey' => $userImportExistingLoggingExchange->queues->userImportExistingLoggingQueue->binding_key,
+          'name' => $loggingGatewayExchange->queues->loggingGatewayQueue->name,
+          'passive' => $loggingGatewayExchange->queues->loggingGatewayQueue->passive,
+          'durable' =>  $loggingGatewayExchange->queues->loggingGatewayQueue->durable,
+          'exclusive' =>  $loggingGatewayExchange->queues->loggingGatewayQueue->exclusive,
+          'auto_delete' =>  $loggingGatewayExchange->queues->loggingGatewayQueue->auto_delete,
+          'bindingKey' => $loggingGatewayExchange->queues->loggingGatewayQueue->binding_key,
         ),
       ),
     );
-    $config['routingKey'] = $userImportExistingLoggingExchange->queues->userImportExistingLoggingQueue->routing_key;
+    $config['routingKey'] = $loggingGatewayExchange->queues->loggingGatewayQueue->routing_key;
+
     $mbUserImportLogging = new \MessageBroker($this->credentials, $config);
 
     $importStat['log-type'] = 'file-import';
@@ -353,7 +353,6 @@ class MBP_UserImport
     $importStat['source'] = $source;
     $payload = serialize($importStat);
     $mbUserImportLogging->publishMessage($payload);
-
   }
 
   /*
