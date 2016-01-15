@@ -58,24 +58,12 @@ class MBP_UserCSVfileTools
 
     echo '------- mbp-user-import_manageData->gatherIMAP() ** ' . $source . ' ** START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
-    $targetSourceDetails = array(
-      'niche' => array(
+    $targetSourceDetails = [
+      'niche' => [
         'from' => '	no-reply@batchrobot.com',
         'subject' => 'Niche-DoSomething Daily Co-regs',
-      ),
-      'hercampus' => array(
-        'from' => 'chelseaevans@hercampus.com',
-        'subject' => 'Comeback Clothes + Her Campus',
-      ),
-      'att-ichannel' => array(
-        'from' => 'p1ia1c1@klph070.kcdc.att.com',
-        'subject' => 'AT&T U-Verse DoSomething Fulfillment File',
-      ),
-      'teenlife' => array(
-        'from' => 'stephanie@teenlife.com',
-        'subject' => 'TeenLife + DoSomething.org Co-Marketing',
-      ),
-    );
+      ],
+    ];
 
     $existingFiles = scandir(__DIR__ . '/../data/' . $source);
     unset($existingFiles[0]);
