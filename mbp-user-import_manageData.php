@@ -20,9 +20,6 @@ echo '------- mbp-user-import_manageData START: ' . date('j D M Y G:i:s T') . ' 
 // Kick off
 $allowedSources = array(
   'niche',
-  'hercampus',
-  'att-ichannel',
-  'teenlife'
 );
 
 $source = NULL;
