@@ -24,27 +24,6 @@ class MBP_UserImport
   private $messageBroker;
 
   /**
-   * Collection of configuration settings.
-   *
-   * @var array
-   */
-  private $config;
-
-  /**
-   * Setting from external services - Mailchimp.
-   *
-   * @var array
-   */
-  private $settings;
-
-  /**
-   * Collection of secret connection settings.
-   *
-   * @var array
-   */
-  private $credentials;
-
-  /**
    * Setting from external services - Mailchimp.
    *
    * @var array
@@ -52,28 +31,14 @@ class MBP_UserImport
   private $statHat;
 
   /**
-   * Constructor for MBC_UserEvent
-   *
-   * @param array $credentials
-   *   Secret settings from mb-secure-config.inc
-   *
-   * @param array $config
-   *   Configuration settings from mb-config.inc
+   * Constructor for MBC_UserImport. Load settings to be used by instance of class. Settings
+   * based on Singleton configuration values defined in .config.in file.
    */
-  public function __construct($credentials, $config, $settings) {
+  public function __construct() {
 
-    $this->credentials = $credentials;
-    $this->config = $config;
-    $this->settings = $settings;
-
-    // Setup RabbitMQ connection
-    $this->messageBroker = new \MessageBroker($credentials, $config);
-
-    $this->statHat = new StatHat([
-      'ez_key' => $settings['stathat_ez_key'],
-      'debug' => $settings['stathat_disable_tracking']
-    ]);
-
+    $this->mbConfig = MB_Configuration::getInstance();
+    $this->messageBroker = $this->mbConfig->getProperty($targetMBconfig);
+    $this->statHat = $this->mbConfig->getProperty('statHat');
   }
 
   /*
@@ -153,46 +118,6 @@ class MBP_UserImport
               );
               break;
 
-            case 'hercampus':
-
-              $signupKeys = array (
-                // 'entry_id',
-                'first_name',
-                'last_name',
-                'email',
-                'phone',
-              );
-              break;
-
-            case 'att-ichannel':
-
-              // DTL,03/18/2015 16:33:01,kimberly Xxx,1234567890,xxx@att.com
-              // ATTR,Date of Birth,12061988
-              $signupKeys = array (
-                'name',
-                'phone',
-                'email',
-                'birthdate',
-              );
-              break;
-
-            case 'teenlife':
-
-              $signupKeys = array (
-                'first_name',
-                'last_name',
-                'email',
-                'zip_code',
-                'mobile_number',
-                'member_type',
-                'graduation_year',
-                'birthdate',
-                'member_source',
-                'conversion_date',
-                'conversion_page',
-              );
-              break;
-
             default:
               echo 'produceCSVImport(): Undefined source. ', PHP_EOL;
               exit;
@@ -201,33 +126,10 @@ class MBP_UserImport
         }
         else {
 
-          if ($source == 'att-ichannel') {
-
-            // Skip the last line - END OF FILE
-            if (isset( $signups[$signupCount + 1])) {
-
-              // Combine DTL and ATTR rows
-              $signupsATTR = explode(',', $signups[$signupCount + 1]);
-              $birthdate = substr($signupsATTR[2], 0, 2) . '/' . substr($signupsATTR[2], 2, 2) . '/' . substr($signupsATTR[2], 4, 4);
-              $signup = $signups[$signupCount] . ',' . $birthdate;
-              $signup = str_replace("\r\n", '',   $signup);
-              $signupData = explode(',', $signup);
-
-              // Remove column heading and creation date
-              unset($signupData[0]);
-              unset($signupData[1]);
-              $signupData = array_values($signupData);
-
-            }
-
-            $signupCount++;
-          }
-          else {
-            $signup = $signups[$signupCount];
-            $signup = str_replace('"', '',  $signup);
-            $signup = str_replace("\r\n", '',  $signup);
-            $signupData = explode(',', $signup);
-          }
+          $signup = $signups[$signupCount];
+          $signup = str_replace('"', '',  $signup);
+          $signup = str_replace("\r\n", '',  $signup);
+          $signupData = explode(',', $signup);
 
           $data = array();
           $data = array(
