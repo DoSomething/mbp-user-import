@@ -29,9 +29,6 @@ elseif (isset($argv[1])) {
 
 $allowedSources = array(
   'niche',
-  'hercampus',
-  'att-ichannel',
-  'teenlife',
 );
 
 $source = NULL;
