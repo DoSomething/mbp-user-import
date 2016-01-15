@@ -22,15 +22,12 @@ class MBP_UserImportTest extends PHPUnit_Framework_TestCase {
     require_once __DIR__ . '/../mbp-user-import.config.inc';
 
     // Create  MBP_UserImport object to access findNextTargetFile() method for testing
-    $mbpUserImport = new DoSomething\MBP_UserImport\MBP_UserImport($credentials, $config, $settings);
+    $mbpUserImport = new MBP_UserImport();
     
     // List of valid sources
     // @todo: Move this to include file so production and app can share source values as settings.
     $sources = array(
       'niche',
-      'att-ichannel',
-      'hercampus',
-      'teenlife',
     );
     
     foreach ($sources as $source) {
