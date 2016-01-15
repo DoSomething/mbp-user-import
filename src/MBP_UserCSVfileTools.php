@@ -6,12 +6,16 @@
 
 namespace DoSomething\MBP_UserImport;
 
+use DoSomething\MB_Toolbox\MB_Configuration;
+use \Exception;
 use Ddeboer\Imap\SearchExpression;
 use Ddeboer\Imap\Search\Email\FromAddress;
 use Ddeboer\Imap\Server;
 use DoSomething\StatHat\Client as StatHat;
 
-
+/**
+ *
+ */
 class MBP_UserCSVfileTools
 {
 
@@ -40,12 +44,10 @@ class MBP_UserCSVfileTools
    */
   public function __construct($settings) {
 
-    $this->settings = $settings;
+    $this->mbConfig = MB_Configuration::getInstance();
 
-    $this->statHat = new StatHat([
-      'ez_key' => $settings['stathat_ez_key'],
-      'debug' => $settings['stathat_disable_tracking']
-    ]);
+    $this->settings = $this->mbConfig->getProperty('generalSettings');
+    $this->statHat = $this->mbConfig->getProperty('statHat');
   }
 
   /*
@@ -60,8 +62,12 @@ class MBP_UserCSVfileTools
 
     $targetSourceDetails = [
       'niche' => [
-        'from' => '	no-reply@batchrobot.com',
+        'from' => 'no-reply@batchrobot.com',
         'subject' => 'Niche-DoSomething Daily Co-regs',
+      ],
+      'afterSchool' => [
+        'from' => '',
+        'subject' => '',
       ],
     ];
 
@@ -95,7 +101,6 @@ class MBP_UserCSVfileTools
                 }
                 echo $attachment->getFilename() . ' retrieved from gmail account.', PHP_EOL;
                 file_put_contents(__DIR__ . '/../data/' . $source . '/' . $attachment->getFilename(), $attachment->getDecodedContent());
-                $this->statHat->ezCount('mbp-user-import_manageData: ' . $source, 1);
               }
 
             }
