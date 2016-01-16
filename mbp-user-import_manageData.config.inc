@@ -9,6 +9,11 @@ use DoSomething\MB_Toolbox\MB_Configuration;
 // symlinks in the project directory point to the actual location of the files
 require_once __DIR__ . '/messagebroker-config/mb-secure-config.inc';
 
+define("ALLOWED_SOURCES", serialize([
+  'niche',
+  'afterSchool'
+]));
+
 $mbConfig = MB_Configuration::getInstance();
 
 $mbConfig->setProperty('gmailMachine', [

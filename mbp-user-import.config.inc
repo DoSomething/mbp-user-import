@@ -10,6 +10,11 @@ use DoSomething\StatHat\Client as StatHat;
 // symlinks in the project directory point to the actual location of the file
 require_once __DIR__ . '/messagebroker-config/mb-secure-config.inc';
 
+define("ALLOWED_SOURCES", serialize([
+  'niche',
+  'afterSchool'
+]));
+
 $mbConfig = MB_Configuration::getInstance();
 
 // Settings
