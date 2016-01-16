@@ -9,10 +9,6 @@
 use DoSomething\MBP_UserImport\MBP_UserCSVfileTools;
 
 date_default_timezone_set('America/New_York');
-define("ALLOWED_SOURCES", serialize([
-  'niche',
-  'afterSchool'
-]));
 
 // Load up the Composer autoload magic
 require_once __DIR__ . '/vendor/autoload.php';
