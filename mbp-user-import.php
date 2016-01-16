@@ -12,10 +12,6 @@
 use DoSomething\MBP_UserImport\MBP_UserImport;
 
 date_default_timezone_set('America/New_York');
-define("ALLOWED_SOURCES", serialize([
-  'niche',
-  'afterSchool'
-]));
 
 // Load up the Composer autoload magic
 require_once __DIR__ . '/vendor/autoload.php';
@@ -59,7 +55,7 @@ function gatherParameters() {
     $source = $argv[2];
   }
 
-  $allowedSources = unserialize(ALLOWED_SOURCE);
+  $allowedSources = unserialize(ALLOWED_SOURCES);
   if (in_array($source, $allowedSources)) {
     die('Invalid source value. Acceptable values: ' . print_r($allowedSources, true));
   }
