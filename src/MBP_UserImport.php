@@ -24,6 +24,13 @@ class MBP_UserImport
   private $messageBroker;
 
   /**
+   * Message Broker Logging object that details the connection to RabbitMQ for logging messages.
+   *
+   * @var object
+   */
+  private $messageBrokerLogging;
+
+  /**
    * Setting from external services - Mailchimp.
    *
    * @var array
@@ -37,7 +44,8 @@ class MBP_UserImport
   public function __construct() {
 
     $this->mbConfig = MB_Configuration::getInstance();
-    $this->messageBroker = $this->mbConfig->getProperty($targetMBconfig);
+    $this->messageBroker = $this->mbConfig->getProperty('messageBroker');
+    $this->messageBrokerLogging = $this->mbConfig->getProperty('messageBrokerLogging');
     $this->statHat = $this->mbConfig->getProperty('statHat');
   }
 
@@ -221,40 +229,14 @@ class MBP_UserImport
    */
   private function logging($signupCount, $skipped, $source, $targetCSVFile) {
 
-    $configSource = __DIR__ . '/../messagebroker-config/mb_config.json';
-    $mbConfig = new MB_Configuration($configSource, $this->settings);
-    $loggingGatewayExchange = $mbConfig->exchangeSettings('directLoggingGateway');
-    $config = array(
-      'exchange' => array(
-        'name' => $loggingGatewayExchange->name,
-        'type' => $loggingGatewayExchange->type,
-        'passive' => $loggingGatewayExchange->passive,
-        'durable' => $loggingGatewayExchange->durable,
-        'auto_delete' => $loggingGatewayExchange->auto_delete,
-      ),
-      'queue' => array(
-        array(
-          'name' => $loggingGatewayExchange->queues->loggingGatewayQueue->name,
-          'passive' => $loggingGatewayExchange->queues->loggingGatewayQueue->passive,
-          'durable' =>  $loggingGatewayExchange->queues->loggingGatewayQueue->durable,
-          'exclusive' =>  $loggingGatewayExchange->queues->loggingGatewayQueue->exclusive,
-          'auto_delete' =>  $loggingGatewayExchange->queues->loggingGatewayQueue->auto_delete,
-          'bindingKey' => $loggingGatewayExchange->queues->loggingGatewayQueue->binding_key,
-        ),
-      ),
-    );
-    $config['routingKey'] = $loggingGatewayExchange->queues->loggingGatewayQueue->routing_key;
-
-    $mbUserImportLogging = new \MessageBroker($this->credentials, $config);
-
+    $importStat = [];
     $importStat['log-type'] = 'file-import';
-    $importStat['target-CSV-file'] = $targetCSVFile;
+    $importStat['log-timestamp'] = time();
     $importStat['signup-count'] = $signupCount;
     $importStat['skipped'] = $skipped;
-    $importStat['log-timestamp'] = time();
     $importStat['source'] = $source;
-    $payload = serialize($importStat);
-    $mbUserImportLogging->publishMessage($payload);
+    $importStat['target-CSV-file'] = $targetCSVFile;
+    $this->messageBrokerLogging->publish($payload, 'loggingGateway');
   }
 
   /*
