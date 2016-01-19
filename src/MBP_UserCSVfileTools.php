@@ -35,14 +35,8 @@ class MBP_UserCSVfileTools
 
   /**
    * Constructor for MBP_userCSVfileTools
-   *
-   * @param array $credentials
-   *   Secret settings from mb-secure-config.inc
-   *
-   * @param array $config
-   *   Configuration settings from mb-config.inc
    */
-  public function __construct($settings) {
+  public function __construct() {
 
     $this->mbConfig = MB_Configuration::getInstance();
 
