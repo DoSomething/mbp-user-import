@@ -19,7 +19,7 @@ echo '------- mbp-user-import_manageData START: ' . date('j D M Y G:i:s T') . ' 
 // Kick off
 $source = gatherParameters();
 if (!empty($source))  {
-    $mbpUserCSVfileTools = new MBP_UserCSVfileTools($settings);
+    $mbpUserCSVfileTools = new MBP_UserCSVfileTools();
     $status = $mbpUserCSVfileTools->gatherIMAP($source);
 }
 else {
@@ -44,8 +44,8 @@ function gatherParameters() {
     $source = $argv[1];
   }
 
-  $allowedSources = unserialize(ALLOWED_SOURCE);
-  if (in_array($source, $allowedSources)) {
+  $allowedSources = unserialize(ALLOWED_SOURCES);
+  if (!in_array($source, $allowedSources)) {
     die('Invalid source value. Acceptable values: ' . print_r($allowedSources, true));
   }
 
