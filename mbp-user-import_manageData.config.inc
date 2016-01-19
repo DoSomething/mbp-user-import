@@ -4,6 +4,7 @@
  */
  
 use DoSomething\MB_Toolbox\MB_Configuration;
+use DoSomething\StatHat\Client as StatHat;
 
 // Load configuration settings common to the Message Broker system
 // symlinks in the project directory point to the actual location of the files
