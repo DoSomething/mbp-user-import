@@ -80,6 +80,7 @@ class MBP_UserCSVfileTools
 
     $server = new Server('imap.gmail.com');
     $connection = $server->authenticate($this->settings['gmail_machine_username'], $this->settings['gmail_machine_password']);
+    $mailbox = $connection->getMailbox($source . '-processed');
 
     $mailboxes = $connection->getMailboxes();
     foreach ($mailboxes as $mailbox) {
@@ -104,6 +105,7 @@ class MBP_UserCSVfileTools
               }
 
             }
+            $message->move($mailbox);
 
           }
 
