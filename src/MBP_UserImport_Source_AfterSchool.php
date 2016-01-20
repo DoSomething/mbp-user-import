@@ -17,26 +17,29 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
 {
 
   /**
-   * Constructor for MBC_BaseConsumer - all consumer applications should extend this base class.
-   */
-  public function __construct($message) {
-
-    parent::__construct();
-    $this->keys = $this->setKeys();
-  }
-
-  /**
    * Supported key / columns in CSV file from source.
    */
   private function setKeys() {
-    
+
+    $keys = [
+      '???',
+    ];
+
+    return $keys;
   }
   
   /**
    * Logic to process CSV file based on column / line endings.
+   *
+   * @param array $CSVRow
+   *   A row of user data from the CSV file.
+   *
+   * @return array $data
+   *   CSV values formatted into an array.
    */
-  public function process() {
-    
+  public function process($CSVRow) {
+
+    return $data;
   }
 
 }
