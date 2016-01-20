@@ -62,14 +62,9 @@ class MBP_UserImport
 
     echo '------- mbp-user-import->produceCSVImport() ' . $source . ' START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
-    $imported = 0;
-    $skipped = 0;
-    $signupKeys = array();
-    $existingStatus = array(
-      'email' => 0,
-      'mobile' => 0,
-      'drupal' => 0
-    );
+    // Create instance of source class to use values specific to the source type.
+    $sourceClass = 'MBP_UserImport_Source_' . $source;
+    $this->source = new $sourceClass;
 
     if ($targetCSVFile == 'nextFile') {
       $targetCSVFile = $this->findNextTargetFile($source);
@@ -77,109 +72,55 @@ class MBP_UserImport
       $targetCSVFileName = $targetFilePaths[count($targetFilePaths) - 1];
     }
     else {
-      $targetCSVFileName = $targetCSVFile;
       $targetCSVFile = __DIR__ . '/../data/' . $source . '/' . $targetCSVFile;
+      $targetCSVFileName = $targetCSVFile;
     }
 
     // Is there a file found?
-    if ($targetCSVFile != FALSE && file_exists($targetCSVFile)) {
-      $signups = file($targetCSVFile);
-
-      // Explode CSV data by line breaks
-      if (count($signups) == 1 && substr_count($signups[0], "\r") > 0) {
-        $signups = explode("\r", $signups[0]);
-      }
-
-      $totalSignups = count($signups) - 1;
-      for ($signupCount = 0; $signupCount <= $totalSignups; $signupCount++) {
-
-        // Check that the coloumn assignment are as expected
-        if ($signupCount == 0) {
-
-          switch ($source) {
-            case 'niche':
-
-              $signupKeys = array (
-                'first_name',
-                'last_name',
-                'email',
-                'address1',
-                'address2',
-                'city',
-                'state',
-                'zip',
-                'phone',
-                'hs_gradyear',
-                'birthdate',
-                'race',
-                'religion',
-                'hs_name',
-                'college_name',
-                'major_name',
-                'degree_type',
-                'sat_math',
-                'sat_verbal',
-                'sat_writing',
-                'act_math',
-                'act_english',
-                'gpa',
-                'role',
-              );
-              break;
-
-            default:
-              echo 'produceCSVImport(): Undefined source. ', PHP_EOL;
-              exit;
-          }
-
-        }
-        else {
-
-          $signup = $signups[$signupCount];
-          $signup = str_replace('"', '',  $signup);
-          $signup = str_replace("\r\n", '',  $signup);
-          $signupData = explode(',', $signup);
-
-          $data = array();
-          $data = array(
-            'subscribed' => 1,
-            'activity_timestamp' => time(),
-            'application_id' => 100, // Import
-            'source' => $source,
-            'source_file' => $targetCSVFileName
-          );
-
-          foreach ($signupKeys as $signupIndex => $signupKey) {
-            if (isset($signupData[$signupIndex]) && $signupData[$signupIndex] != '') {
-              $data[$signupKey] = $signupData[$signupIndex];
-            }
-          }
-
-          // Required
-          if (isset($data['email']) && $data['email'] != '') {
-            $payload = json_encode($data);
-            $status = $this->messageBroker->publish($payload, 'userImport');
-            $imported++;
-          }
-          elseif ($signupCount < count($signups)) {
-            $skipped++;
-          }
-        }
-      }
-
-      // Log activity
-      $this->logging($imported, $skipped, $source, $targetCSVFileName);
-
-      // Archive file to prevent processing again and to backup to box.com
-      $this->archiveCSV($targetCSVFile);
+    if ($targetCSVFile == false || !file_exists($targetCSVFile)) {
+      throw new Exception($targetCSVFile . ' not fount.');
     }
-    else {
-      throw new Exception($targetCSVFile . ' file not fount.');
+
+    $signups = file($targetCSVFile);
+
+    // Support files missing line breaks "\n" (Windoz and old OSX). Explode CSV data by line breaks to
+    // define each user data row.
+    if (count($signups) == 1 && substr_count($signups[0], "\r") > 0) {
+      $signups = explode("\r", $signups[0]);
     }
+
+    // Process file contents by row
+    $totalSignups = count($signups) - 1;
+    for ($signupCount = 1; $signupCount <= $totalSignups; $signupCount++) {
+
+      $signup = $signups[$signupCount];
+      $data = $this->source->process($signup);
+
+      $data['subscribed'] = 1;
+      $data['activity_timestamp'] =  time();
+      $data['application_id'] = 100; // Import
+      $data['source'] = $source;
+      $data['source_file'] = $targetCSVFileName;
+
+      // email Required, create message for user row
+      if (isset($data['email']) && $data['email'] != '') {
+        $payload = json_encode($data);
+        $status = $this->messageBroker->publish($payload, 'userImport');
+        $this->imported++;
+      }
+      elseif ($signupCount < count($signups)) {
+        $this->skipped++;
+      }
+    }
+
+    // Log activity
+    $this->logging($source, $targetCSVFileName);
+
+    // Archive file to prevent processing again and to backup to box.com
+    $this->archiveCSV($targetCSVFile);
 
     echo $imported . ' email addresses imported.' . $skipped . ' skipped.', PHP_EOL;
     echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
-
   }
 
   /*
@@ -224,13 +165,13 @@ class MBP_UserImport
    * @param string $targetCSVFile
    *   The file name of the CSV import file.
    */
-  private function logging($signupCount, $skipped, $source, $targetCSVFile) {
+  private function logging($source, $targetCSVFile) {
 
     $message = [];
     $message['log-type'] = 'file-import';
     $message['log-timestamp'] = time();
-    $message['signup-count'] = $signupCount;
-    $message['skipped'] = $skipped;
+    $message['signup-count'] = $this->signupCount;
+    $message['skipped'] = $this->skipped;
     $message['source'] = $source;
     $message['target-CSV-file'] = $targetCSVFile;
     $message = json_encode($message);
