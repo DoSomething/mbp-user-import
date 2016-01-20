@@ -8,6 +8,7 @@ namespace DoSomething\MBP_UserImport;
 
 use DoSomething\MB_Toolbox\MB_Configuration;
 use DoSomething\StatHat\Client as StatHat;
+use \Exception;
 
 /**
  * MBP_UserImport class - functionality related to the Message Broker
@@ -157,7 +158,7 @@ class MBP_UserImport
           // Required
           if (isset($data['email']) && $data['email'] != '') {
             $payload = json_encode($data);
-            $status = $this->messageBroker->publishMessage($payload);
+            $status = $this->messageBroker->publish($payload, 'userImport');
             $this->statHat->ezCount('mbp-user-import: produceCSVImport', 1);
             $imported++;
           }
@@ -175,9 +176,7 @@ class MBP_UserImport
       $this->archiveCSV($targetCSVFile);
     }
     else {
-      trigger_error('Invalid file ' . $targetCSVFile, E_USER_WARNING);
-      echo 'ERROR - ' . $targetCSVFile . ' file not fount.', PHP_EOL;
-      return FALSE;
+      throw new Exception($targetCSVFile . ' file not fount.');
     }
 
     echo $imported . ' email addresses imported.' . $skipped . ' skipped.', "\n";
@@ -229,14 +228,15 @@ class MBP_UserImport
    */
   private function logging($signupCount, $skipped, $source, $targetCSVFile) {
 
-    $importStat = [];
-    $importStat['log-type'] = 'file-import';
-    $importStat['log-timestamp'] = time();
-    $importStat['signup-count'] = $signupCount;
-    $importStat['skipped'] = $skipped;
-    $importStat['source'] = $source;
-    $importStat['target-CSV-file'] = $targetCSVFile;
-    $this->messageBrokerLogging->publish($payload, 'loggingGateway');
+    $message = [];
+    $message['log-type'] = 'file-import';
+    $message['log-timestamp'] = time();
+    $message['signup-count'] = $signupCount;
+    $message['skipped'] = $skipped;
+    $message['source'] = $source;
+    $message['target-CSV-file'] = $targetCSVFile;
+    $message = json_encode($message);
+    $this->messageBrokerLogging->publish($message, 'loggingGateway');
   }
 
   /*
