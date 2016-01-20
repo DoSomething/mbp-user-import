@@ -61,6 +61,7 @@ abstract class MBP_UserImport_BaseSource
 
     $this->mbConfig = MB_Configuration::getInstance();
     $this->statHat = $this->mbConfig->getProperty('statHat');
+    $this->keys = $this->setKeys();
   }
 
   /**
