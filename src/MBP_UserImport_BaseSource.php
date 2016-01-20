@@ -10,10 +10,10 @@ use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Configuration;
 
 /*
- * MBP_UserImport_BaseService: Used to define the structure of values specific to an
+ * MBP_UserImport_BaseSource: Used to define the structure of values specific to an
  * import source.
  */
-abstract class MBP_UserImport_BaseService
+abstract class MBP_UserImport_BaseSource
 {
 
   /**
@@ -29,6 +29,27 @@ abstract class MBP_UserImport_BaseService
    * @var object
    */
   protected $statHat;
+  
+  /**
+   * A list of supported keys in the CSV file provided by the source.
+   *
+   * @var array
+   */
+  protected $keys;
+  
+  /**
+   * The number of user rows from CSV file processed.
+   *
+   * @var integer
+   */
+  protected $imported = 0;
+  
+  /**
+   * The number of user rows skipped from CSV file when processing.
+   *
+   * @var integer
+   */
+  protected $skipped = 0;
 
   /**
    * Constructor for MBC_BaseConsumer - all consumer applications should extend this base class.
@@ -50,6 +71,6 @@ abstract class MBP_UserImport_BaseService
   /**
    * Logic to process CSV file based on column / line endings.
    */
-  abstract public function process();
+  abstract public function process($data);
 
 }
