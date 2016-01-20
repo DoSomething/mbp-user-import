@@ -10,8 +10,10 @@
  */
 
 use DoSomething\MBP_UserImport\MBP_UserImport;
+use \Exception;
 
 date_default_timezone_set('America/New_York');
+define('CONFIG_PATH',  __DIR__ . '/messagebroker-config');
 
 // Load up the Composer autoload magic
 require_once __DIR__ . '/vendor/autoload.php';
@@ -19,13 +21,19 @@ require_once __DIR__ . '/mbp-user-import.config.inc';
 
 echo '------- mbp-user-import START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
-list($targetFile, $source) = gatherParameters();
-if (!empty($source))  {
-  $mbpUserImport = new MBP_UserImport();
-  $mbpUserImport->produceCSVImport($targetFile, $source);
+try {
+
+  list($targetFile, $source) = gatherParameters();
+  if (!empty($source))  {
+    $mbpUserImport = new MBP_UserImport();
+    $mbpUserImport->produceCSVImport($targetFile, $source);
+  }
+  else {
+    throw new Exception('"source" parameter not defined.');
+  }
 }
-else {
-  echo '"source" parameter not defined.', PHP_EOL;
+catch(Exception $e) {
+  echo $e-getMessage();
 }
 
 echo '------- mbp-user-import END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
@@ -56,7 +64,7 @@ function gatherParameters() {
   }
 
   $allowedSources = unserialize(ALLOWED_SOURCES);
-  if (in_array($source, $allowedSources)) {
+  if (!in_array($source, $allowedSources)) {
     die('Invalid source value. Acceptable values: ' . print_r($allowedSources, true));
   }
 
