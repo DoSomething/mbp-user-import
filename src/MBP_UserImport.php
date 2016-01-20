@@ -8,6 +8,7 @@ namespace DoSomething\MBP_UserImport;
 
 use DoSomething\MB_Toolbox\MB_Configuration;
 use DoSomething\StatHat\Client as StatHat;
+use \Exception;
 
 /**
  * MBP_UserImport class - functionality related to the Message Broker
@@ -24,25 +25,11 @@ class MBP_UserImport
   private $messageBroker;
 
   /**
-   * Collection of configuration settings.
+   * Message Broker Logging object that details the connection to RabbitMQ for logging messages.
    *
-   * @var array
+   * @var object
    */
-  private $config;
-
-  /**
-   * Setting from external services - Mailchimp.
-   *
-   * @var array
-   */
-  private $settings;
-
-  /**
-   * Collection of secret connection settings.
-   *
-   * @var array
-   */
-  private $credentials;
+  private $messageBrokerLogging;
 
   /**
    * Setting from external services - Mailchimp.
@@ -52,28 +39,15 @@ class MBP_UserImport
   private $statHat;
 
   /**
-   * Constructor for MBC_UserEvent
-   *
-   * @param array $credentials
-   *   Secret settings from mb-secure-config.inc
-   *
-   * @param array $config
-   *   Configuration settings from mb-config.inc
+   * Constructor for MBC_UserImport. Load settings to be used by instance of class. Settings
+   * based on Singleton configuration values defined in .config.in file.
    */
-  public function __construct($credentials, $config, $settings) {
+  public function __construct() {
 
-    $this->credentials = $credentials;
-    $this->config = $config;
-    $this->settings = $settings;
-
-    // Setup RabbitMQ connection
-    $this->messageBroker = new \MessageBroker($credentials, $config);
-
-    $this->statHat = new StatHat([
-      'ez_key' => $settings['stathat_ez_key'],
-      'debug' => $settings['stathat_disable_tracking']
-    ]);
-
+    $this->mbConfig = MB_Configuration::getInstance();
+    $this->messageBroker = $this->mbConfig->getProperty('messageBroker');
+    $this->messageBrokerLogging = $this->mbConfig->getProperty('messageBrokerLogging');
+    $this->statHat = $this->mbConfig->getProperty('statHat');
   }
 
   /*
@@ -86,7 +60,7 @@ class MBP_UserImport
    */
   public function produceCSVImport($targetCSVFile, $source) {
 
-    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' START: ' . date('j D M Y G:i:s T') . ' -------', "\n";
+    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
     $imported = 0;
     $skipped = 0;
@@ -153,46 +127,6 @@ class MBP_UserImport
               );
               break;
 
-            case 'hercampus':
-
-              $signupKeys = array (
-                // 'entry_id',
-                'first_name',
-                'last_name',
-                'email',
-                'phone',
-              );
-              break;
-
-            case 'att-ichannel':
-
-              // DTL,03/18/2015 16:33:01,kimberly Xxx,1234567890,xxx@att.com
-              // ATTR,Date of Birth,12061988
-              $signupKeys = array (
-                'name',
-                'phone',
-                'email',
-                'birthdate',
-              );
-              break;
-
-            case 'teenlife':
-
-              $signupKeys = array (
-                'first_name',
-                'last_name',
-                'email',
-                'zip_code',
-                'mobile_number',
-                'member_type',
-                'graduation_year',
-                'birthdate',
-                'member_source',
-                'conversion_date',
-                'conversion_page',
-              );
-              break;
-
             default:
               echo 'produceCSVImport(): Undefined source. ', PHP_EOL;
               exit;
@@ -201,33 +135,10 @@ class MBP_UserImport
         }
         else {
 
-          if ($source == 'att-ichannel') {
-
-            // Skip the last line - END OF FILE
-            if (isset( $signups[$signupCount + 1])) {
-
-              // Combine DTL and ATTR rows
-              $signupsATTR = explode(',', $signups[$signupCount + 1]);
-              $birthdate = substr($signupsATTR[2], 0, 2) . '/' . substr($signupsATTR[2], 2, 2) . '/' . substr($signupsATTR[2], 4, 4);
-              $signup = $signups[$signupCount] . ',' . $birthdate;
-              $signup = str_replace("\r\n", '',   $signup);
-              $signupData = explode(',', $signup);
-
-              // Remove column heading and creation date
-              unset($signupData[0]);
-              unset($signupData[1]);
-              $signupData = array_values($signupData);
-
-            }
-
-            $signupCount++;
-          }
-          else {
-            $signup = $signups[$signupCount];
-            $signup = str_replace('"', '',  $signup);
-            $signup = str_replace("\r\n", '',  $signup);
-            $signupData = explode(',', $signup);
-          }
+          $signup = $signups[$signupCount];
+          $signup = str_replace('"', '',  $signup);
+          $signup = str_replace("\r\n", '',  $signup);
+          $signupData = explode(',', $signup);
 
           $data = array();
           $data = array(
@@ -247,13 +158,11 @@ class MBP_UserImport
           // Required
           if (isset($data['email']) && $data['email'] != '') {
             $payload = json_encode($data);
-            $status = $this->messageBroker->publishMessage($payload);
-            $this->statHat->ezCount('mbp-user-import: produceCSVImport', 1);
+            $status = $this->messageBroker->publish($payload, 'userImport');
             $imported++;
           }
           elseif ($signupCount < count($signups)) {
             $skipped++;
-            $this->statHat->ezCount('mbp-user-import: skippedCSVImport - invalid email', 1);
           }
         }
       }
@@ -265,13 +174,11 @@ class MBP_UserImport
       $this->archiveCSV($targetCSVFile);
     }
     else {
-      trigger_error('Invalid file ' . $targetCSVFile, E_USER_WARNING);
-      echo 'ERROR - ' . $targetCSVFile . ' file not fount.', PHP_EOL;
-      return FALSE;
+      throw new Exception($targetCSVFile . ' file not fount.');
     }
 
-    echo $imported . ' email addresses imported.' . $skipped . ' skipped.', "\n";
-    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('j D M Y G:i:s T') . ' -------', "\n";
+    echo $imported . ' email addresses imported.' . $skipped . ' skipped.', PHP_EOL;
+    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
   }
 
@@ -319,40 +226,15 @@ class MBP_UserImport
    */
   private function logging($signupCount, $skipped, $source, $targetCSVFile) {
 
-    $configSource = __DIR__ . '/../messagebroker-config/mb_config.json';
-    $mbConfig = new MB_Configuration($configSource, $this->settings);
-    $loggingGatewayExchange = $mbConfig->exchangeSettings('directLoggingGateway');
-    $config = array(
-      'exchange' => array(
-        'name' => $loggingGatewayExchange->name,
-        'type' => $loggingGatewayExchange->type,
-        'passive' => $loggingGatewayExchange->passive,
-        'durable' => $loggingGatewayExchange->durable,
-        'auto_delete' => $loggingGatewayExchange->auto_delete,
-      ),
-      'queue' => array(
-        array(
-          'name' => $loggingGatewayExchange->queues->loggingGatewayQueue->name,
-          'passive' => $loggingGatewayExchange->queues->loggingGatewayQueue->passive,
-          'durable' =>  $loggingGatewayExchange->queues->loggingGatewayQueue->durable,
-          'exclusive' =>  $loggingGatewayExchange->queues->loggingGatewayQueue->exclusive,
-          'auto_delete' =>  $loggingGatewayExchange->queues->loggingGatewayQueue->auto_delete,
-          'bindingKey' => $loggingGatewayExchange->queues->loggingGatewayQueue->binding_key,
-        ),
-      ),
-    );
-    $config['routingKey'] = $loggingGatewayExchange->queues->loggingGatewayQueue->routing_key;
-
-    $mbUserImportLogging = new \MessageBroker($this->credentials, $config);
-
-    $importStat['log-type'] = 'file-import';
-    $importStat['target-CSV-file'] = $targetCSVFile;
-    $importStat['signup-count'] = $signupCount;
-    $importStat['skipped'] = $skipped;
-    $importStat['log-timestamp'] = time();
-    $importStat['source'] = $source;
-    $payload = serialize($importStat);
-    $mbUserImportLogging->publishMessage($payload);
+    $message = [];
+    $message['log-type'] = 'file-import';
+    $message['log-timestamp'] = time();
+    $message['signup-count'] = $signupCount;
+    $message['skipped'] = $skipped;
+    $message['source'] = $source;
+    $message['target-CSV-file'] = $targetCSVFile;
+    $message = json_encode($message);
+    $this->messageBrokerLogging->publish($message, 'loggingGateway');
   }
 
   /*
@@ -368,11 +250,11 @@ class MBP_UserImport
     $processedCSVFile = $targetCSVFile . '.' . time();
     $archived = rename ($targetCSVFile, $processedCSVFile);
     if ($archived) {
-      echo '-> mbp-user-import->archiveCSV(): ' . $targetCSVFile . ' archived.', "\n";
+      echo '-> mbp-user-import->archiveCSV(): ' . $targetCSVFile . ' archived.', PHP_EOL;
         // @todo: Move file to box.com
     }
     else {
-      echo '-> ERROR: Failed to archive mbp-user-import->archiveCSV(): ' . $targetCSVFile . '. The file name needs to change to prevent further re-processing of the file on the next run of the script.', "\n";
+      throw new Exception('Failed to archive mbp-user-import->archiveCSV(): ' . $targetCSVFile . '. The file name needs to change to prevent further re-processing of the file on the next run of the script.');
     }
 
   }

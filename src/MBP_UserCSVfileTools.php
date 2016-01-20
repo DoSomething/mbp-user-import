@@ -6,12 +6,16 @@
 
 namespace DoSomething\MBP_UserImport;
 
+use DoSomething\MB_Toolbox\MB_Configuration;
+use \Exception;
 use Ddeboer\Imap\SearchExpression;
 use Ddeboer\Imap\Search\Email\FromAddress;
 use Ddeboer\Imap\Server;
 use DoSomething\StatHat\Client as StatHat;
 
-
+/**
+ *
+ */
 class MBP_UserCSVfileTools
 {
 
@@ -31,21 +35,13 @@ class MBP_UserCSVfileTools
 
   /**
    * Constructor for MBP_userCSVfileTools
-   *
-   * @param array $credentials
-   *   Secret settings from mb-secure-config.inc
-   *
-   * @param array $config
-   *   Configuration settings from mb-config.inc
    */
-  public function __construct($settings) {
+  public function __construct() {
 
-    $this->settings = $settings;
+    $this->mbConfig = MB_Configuration::getInstance();
 
-    $this->statHat = new StatHat([
-      'ez_key' => $settings['stathat_ez_key'],
-      'debug' => $settings['stathat_disable_tracking']
-    ]);
+    $this->settings = $this->mbConfig->getProperty('generalSettings');
+    $this->statHat = $this->mbConfig->getProperty('statHat');
   }
 
   /*
@@ -58,24 +54,16 @@ class MBP_UserCSVfileTools
 
     echo '------- mbp-user-import_manageData->gatherIMAP() ** ' . $source . ' ** START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
-    $targetSourceDetails = array(
-      'niche' => array(
-        'from' => '	no-reply@batchrobot.com',
+    $targetSourceDetails = [
+      'niche' => [
+        'from' => 'no-reply@batchrobot.com',
         'subject' => 'Niche-DoSomething Daily Co-regs',
-      ),
-      'hercampus' => array(
-        'from' => 'chelseaevans@hercampus.com',
-        'subject' => 'Comeback Clothes + Her Campus',
-      ),
-      'att-ichannel' => array(
-        'from' => 'p1ia1c1@klph070.kcdc.att.com',
-        'subject' => 'AT&T U-Verse DoSomething Fulfillment File',
-      ),
-      'teenlife' => array(
-        'from' => 'stephanie@teenlife.com',
-        'subject' => 'TeenLife + DoSomething.org Co-Marketing',
-      ),
-    );
+      ],
+      'afterSchool' => [
+        'from' => '',
+        'subject' => '',
+      ],
+    ];
 
     $existingFiles = scandir(__DIR__ . '/../data/' . $source);
     unset($existingFiles[0]);
@@ -86,6 +74,7 @@ class MBP_UserCSVfileTools
 
     $server = new Server('imap.gmail.com');
     $connection = $server->authenticate($this->settings['gmail_machine_username'], $this->settings['gmail_machine_password']);
+    $mailbox = $connection->getMailbox($source . '-processed');
 
     $mailboxes = $connection->getMailboxes();
     foreach ($mailboxes as $mailbox) {
@@ -107,10 +96,10 @@ class MBP_UserCSVfileTools
                 }
                 echo $attachment->getFilename() . ' retrieved from gmail account.', PHP_EOL;
                 file_put_contents(__DIR__ . '/../data/' . $source . '/' . $attachment->getFilename(), $attachment->getDecodedContent());
-                $this->statHat->ezCount('mbp-user-import_manageData: ' . $source, 1);
               }
 
             }
+            $message->move($mailbox);
 
           }
 

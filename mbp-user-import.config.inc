@@ -4,49 +4,37 @@
  */
  
 use DoSomething\MB_Toolbox\MB_Configuration;
+use DoSomething\StatHat\Client as StatHat;
 
 // Load configuration settings common to the Message Broker system
-// symlinks in the project directory point to the actual location of the files
-// Load configuration settings common to the Message Broker system
-// symlinks in the project directory point to the actual location of the files
+// symlinks in the project directory point to the actual location of the file
 require_once __DIR__ . '/messagebroker-config/mb-secure-config.inc';
 
+define("ALLOWED_SOURCES", serialize([
+  'niche',
+  'afterSchool'
+]));
+
+$mbConfig = MB_Configuration::getInstance();
+
 // Settings
-$credentials = array(
+$mbConfig->setProperty('rabbit_credentials', [
   'host' =>  getenv("RABBITMQ_HOST"),
   'port' => getenv("RABBITMQ_PORT"),
   'username' => getenv("RABBITMQ_USERNAME"),
   'password' => getenv("RABBITMQ_PASSWORD"),
   'vhost' => getenv("RABBITMQ_VHOST"),
-);
+]);
 
-$settings = array(
-  'stathat_ez_key' => getenv("STATHAT_EZKEY"),
-  'stathat_disable_tracking' => getenv('DISABLE_STAT_TRACKING'),
-);
+$mbRabbitConfig = $mbConfig->constructRabbitConfig('directUserImport', ['userImportQueue']);
+$rabbitCredentials = $mbConfig->getProperty('rabbit_credentials');
+// Create untility objects for access anywhere within the application as a single instance
+$mbConfig->setProperty('messageBroker', new MessageBroker($rabbitCredentials, $mbRabbitConfig));
 
-$config = array();
-$configSource = __DIR__ . '/messagebroker-config/mb_config.json';
-$mb_config = new MB_Configuration($configSource, $settings);
-$userImportExchange = $mb_config->exchangeSettings('directUserImport');
+$mbRabbitConfig = $mbConfig->constructRabbitConfig('directLoggingGateway', ['loggingGatewayQueue']);
+$mbConfig->setProperty('messageBrokerLogging', new MessageBroker($rabbitCredentials, $mbRabbitConfig));
 
-$config = array(
-  'exchange' => array(
-    'name' => $userImportExchange->name,
-    'type' => $userImportExchange->type,
-    'passive' => $userImportExchange->passive,
-    'durable' => $userImportExchange->durable,
-    'auto_delete' => $userImportExchange->auto_delete,
-  ),
-  'queue' => array(
-    array(
-      'name' => $userImportExchange->queues->userImportQueue->name,
-      'passive' => $userImportExchange->queues->userImportQueue->passive,
-      'durable' =>  $userImportExchange->queues->userImportQueue->durable,
-      'exclusive' =>  $userImportExchange->queues->userImportQueue->exclusive,
-      'auto_delete' =>  $userImportExchange->queues->userImportQueue->auto_delete,
-      'bindingKey' => $userImportExchange->queues->userImportQueue->binding_key,
-    ),
-  ),
-  'routingKey' => $userImportExchange->queues->userImportQueue->routing_key,
-);
+$mbConfig->setProperty('statHat', new StatHat([
+  'ez_key' => getenv("STATHAT_EZKEY"),
+  'debug' => getenv("DISABLE_STAT_TRACKING")
+]));
