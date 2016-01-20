@@ -60,7 +60,7 @@ class MBP_UserImport
    */
   public function produceCSVImport($targetCSVFile, $source) {
 
-    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' START: ' . date('j D M Y G:i:s T') . ' -------', "\n";
+    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
     $imported = 0;
     $skipped = 0;
@@ -159,12 +159,10 @@ class MBP_UserImport
           if (isset($data['email']) && $data['email'] != '') {
             $payload = json_encode($data);
             $status = $this->messageBroker->publish($payload, 'userImport');
-            $this->statHat->ezCount('mbp-user-import: produceCSVImport', 1);
             $imported++;
           }
           elseif ($signupCount < count($signups)) {
             $skipped++;
-            $this->statHat->ezCount('mbp-user-import: skippedCSVImport - invalid email', 1);
           }
         }
       }
@@ -179,8 +177,8 @@ class MBP_UserImport
       throw new Exception($targetCSVFile . ' file not fount.');
     }
 
-    echo $imported . ' email addresses imported.' . $skipped . ' skipped.', "\n";
-    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('j D M Y G:i:s T') . ' -------', "\n";
+    echo $imported . ' email addresses imported.' . $skipped . ' skipped.', PHP_EOL;
+    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
   }
 
@@ -252,11 +250,11 @@ class MBP_UserImport
     $processedCSVFile = $targetCSVFile . '.' . time();
     $archived = rename ($targetCSVFile, $processedCSVFile);
     if ($archived) {
-      echo '-> mbp-user-import->archiveCSV(): ' . $targetCSVFile . ' archived.', "\n";
+      echo '-> mbp-user-import->archiveCSV(): ' . $targetCSVFile . ' archived.', PHP_EOL;
         // @todo: Move file to box.com
     }
     else {
-      echo '-> ERROR: Failed to archive mbp-user-import->archiveCSV(): ' . $targetCSVFile . '. The file name needs to change to prevent further re-processing of the file on the next run of the script.', "\n";
+      throw new Exception('Failed to archive mbp-user-import->archiveCSV(): ' . $targetCSVFile . '. The file name needs to change to prevent further re-processing of the file on the next run of the script.');
     }
 
   }
