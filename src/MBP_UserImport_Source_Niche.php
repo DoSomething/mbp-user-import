@@ -88,6 +88,9 @@ class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
       }
     }
 
+    // All niche users are assumed to be from the United States.
+    $data['user_country'] = 'US';
+
     return $data;
   }
 
