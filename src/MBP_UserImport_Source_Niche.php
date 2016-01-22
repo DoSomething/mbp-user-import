@@ -95,6 +95,9 @@ class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
     // Mobile Commons opt-in path when user registers for site
     $data['mobile_opt_in_path_id'] = '164905';
 
+    // General MailChimp list for US users.
+    $data['mailchimp_list_id'] = 'f2fab1dfd4';
+
     return $data;
   }
 
