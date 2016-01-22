@@ -91,6 +91,10 @@ class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
     // All niche users are assumed to be from the United States.
     $data['user_country'] = 'US';
 
+    // Send all numbers to US mobile service
+    // Mobile Commons opt-in path when user registers for site
+    $data['mobile_opt_in_path_id'] = '164905';
+
     return $data;
   }
 
