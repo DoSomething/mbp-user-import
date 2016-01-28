@@ -67,7 +67,7 @@ abstract class MBP_UserImport_BaseSource
   /**
    * Supported key / columns in CSV file from source.
    */
-  abstract public function keys();
+  abstract protected function setKeys();
   
   /**
    * Logic to process CSV file based on column / line endings.
