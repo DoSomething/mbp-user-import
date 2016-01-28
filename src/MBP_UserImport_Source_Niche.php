@@ -24,9 +24,9 @@ class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
   protected $keys;
 
   /**
-   * Constructor for MBC_BaseConsumer - all consumer applications should extend this base class.
+   * Constructor for MBC_UserImport_Cource_niche - create properties based on setKey method.
    */
-  public function __construct($message) {
+  public function __construct() {
 
     $this->keys = $this->setKeys();
   }
@@ -34,7 +34,7 @@ class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
   /**
    * Supported key / columns in CSV file from source.
    */
-  private function setKeys() {
+  protected function setKeys() {
 
     $keys = [
       'first_name',
@@ -84,7 +84,7 @@ class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
     $data = array();
     foreach ($this->keys as $signupIndex => $signupKey) {
       if (isset($CSVData[$signupIndex]) && $CSVData[$signupIndex] != '') {
-        $data[$signupKey] = $signupData[$signupIndex];
+        $data[$signupKey] = $CSVData[$signupIndex];
       }
     }
 
