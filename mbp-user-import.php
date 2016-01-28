@@ -9,8 +9,7 @@
  * triggered by each entry.
  */
 
-use DoSomething\MBP_UserImport\MBP_UserImport;
-use \Exception;
+use DoSomething\MBP_UserImport\MBP_UserImport_Producer;
 
 date_default_timezone_set('America/New_York');
 define('CONFIG_PATH',  __DIR__ . '/messagebroker-config');
@@ -19,13 +18,13 @@ define('CONFIG_PATH',  __DIR__ . '/messagebroker-config');
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/mbp-user-import.config.inc';
 
+// Kickoff
 echo '------- mbp-user-import START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
-
 try {
 
   list($targetFile, $source) = gatherParameters();
   if (!empty($source))  {
-    $mbpUserImport = new MBP_UserImport();
+    $mbpUserImport = new MBP_UserImport_Producer();
     $mbpUserImport->produceCSVImport($targetFile, $source);
   }
   else {
@@ -33,9 +32,8 @@ try {
   }
 }
 catch(Exception $e) {
-  echo $e-getMessage();
+  echo $e->getMessage(), PHP_EOL;
 }
-
 echo '------- mbp-user-import END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
 /**
