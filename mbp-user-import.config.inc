@@ -11,8 +11,8 @@ use DoSomething\StatHat\Client as StatHat;
 require_once __DIR__ . '/messagebroker-config/mb-secure-config.inc';
 
 define("ALLOWED_SOURCES", serialize([
-  'niche',
-  'afterSchool'
+  'Niche',
+  'AfterSchool'
 ]));
 
 $mbConfig = MB_Configuration::getInstance();
