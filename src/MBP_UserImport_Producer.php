@@ -8,21 +8,29 @@ namespace DoSomething\MBP_UserImport;
 
 use DoSomething\MB_Toolbox\MB_Configuration;
 use DoSomething\StatHat\Client as StatHat;
+use DoSomething\MB_Toolbox\MB_Toolbox_BaseProducer;
 use \Exception;
 
 /**
  * MBP_UserImport class - functionality related to the Message Broker
  * producer mbp-user-import.
  */
-class MBP_UserImport
+class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
 {
 
   /**
-   * Message Broker object that details the connection to RabbitMQ.
+   * The number of sets of user data that were processed.
    *
-   * @var object
+   * @var integer
    */
-  private $messageBroker;
+  private $imported;
+
+  /**
+   * The number of sets of user data that resulted in users being imported.
+   *
+   * @var integer
+   */
+  private $skipped;
 
   /**
    * Message Broker Logging object that details the connection to RabbitMQ for logging messages.
@@ -32,22 +40,17 @@ class MBP_UserImport
   private $messageBrokerLogging;
 
   /**
-   * Setting from external services - Mailchimp.
-   *
-   * @var array
-   */
-  private $statHat;
-
-  /**
    * Constructor for MBC_UserImport. Load settings to be used by instance of class. Settings
    * based on Singleton configuration values defined in .config.in file.
    */
   public function __construct() {
 
+    parent:: __construct();
     $this->mbConfig = MB_Configuration::getInstance();
-    $this->messageBroker = $this->mbConfig->getProperty('messageBroker');
     $this->messageBrokerLogging = $this->mbConfig->getProperty('messageBrokerLogging');
-    $this->statHat = $this->mbConfig->getProperty('statHat');
+    
+    $this->imported = 0;
+    $this->skipped = 0;
   }
 
   /*
@@ -58,13 +61,19 @@ class MBP_UserImport
    * @param string $source
    *   The source of the import data
    */
-  public function produceCSVImport($targetCSVFile, $source) {
+  public function produceCSVImport($targetCSVFile, $source = NULL) {
 
     echo '------- mbp-user-import->produceCSVImport() ' . $source . ' START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
-
+    
     // Create instance of source class to use values specific to the source type.
-    $sourceClass = 'MBP_UserImport_Source_' . $source;
-    $this->source = new $sourceClass;
+    $allowedSources = unserialize(ALLOWED_SOURCES);
+    if (in_array($source, $allowedSources)) {
+      $sourceClassName = __NAMESPACE__ . '\MBP_UserImport_Source_' . $source;
+      $this->source = new $sourceClassName();
+    }
+    else {
+      throw new Exception('Invalid source value.');
+    }
 
     if ($targetCSVFile == 'nextFile') {
       $targetCSVFile = $this->findNextTargetFile($source);
@@ -78,7 +87,7 @@ class MBP_UserImport
 
     // Is there a file found?
     if ($targetCSVFile == false || !file_exists($targetCSVFile)) {
-      throw new Exception($targetCSVFile . ' not fount.');
+      throw new Exception($targetCSVFile . ' not found.');
     }
 
     $signups = file($targetCSVFile);
@@ -104,8 +113,10 @@ class MBP_UserImport
 
       // email Required, create message for user row
       if (isset($data['email']) && $data['email'] != '') {
-        $payload = json_encode($data);
-        $status = $this->messageBroker->publish($payload, 'userImport');
+
+        $payload = parent::generatePayload($data);
+        $payload = parent::produceMessage($payload, 'userImport');
+        
         $this->imported++;
       }
       elseif ($signupCount < count($signups)) {
@@ -119,7 +130,7 @@ class MBP_UserImport
     // Archive file to prevent processing again and to backup to box.com
     $this->archiveCSV($targetCSVFile);
 
-    echo $imported . ' email addresses imported.' . $skipped . ' skipped.', PHP_EOL;
+    echo $this->imported . ' email addresses imported.' . $this->skipped . ' skipped.', PHP_EOL;
     echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
   }
 
@@ -170,7 +181,7 @@ class MBP_UserImport
     $message = [];
     $message['log-type'] = 'file-import';
     $message['log-timestamp'] = time();
-    $message['signup-count'] = $this->signupCount;
+    $message['signup-count'] = $this->imported;
     $message['skipped'] = $this->skipped;
     $message['source'] = $source;
     $message['target-CSV-file'] = $targetCSVFile;
