@@ -4,6 +4,7 @@
  */
  
 use DoSomething\MB_Toolbox\MB_Configuration;
+use Ddeboer\Imap\Server;
 use DoSomething\StatHat\Client as StatHat;
 
 // Load configuration settings common to the Message Broker system
@@ -17,10 +18,12 @@ define("ALLOWED_SOURCES", serialize([
 
 $mbConfig = MB_Configuration::getInstance();
 
-$mbConfig->setProperty('gmailMachine', [
-  'gmail_machine_username' => getenv("GMAIL_MACHINE_USERNAME"),
-  'gmail_machine_password' => getenv("GMAIL_MACHINE_PASSWORD"),
-]);
+$emailServer = new Server('imap.gmail.com');
+
+$mbConfig->setProperty('gmail', $emailServer->authenticate(
+  getenv("GMAIL_MACHINE_USERNAME"),
+  getenv("GMAIL_MACHINE_PASSWORD")
+);
 $mbConfig->setProperty('statHat', new StatHat([
   'ez_key' => getenv("STATHAT_EZKEY"),
   'debug' => getenv("DISABLE_STAT_TRACKING")
