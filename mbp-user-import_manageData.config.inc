@@ -23,7 +23,7 @@ $emailServer = new Server('imap.gmail.com');
 $mbConfig->setProperty('gmail', $emailServer->authenticate(
   getenv("GMAIL_MACHINE_USERNAME"),
   getenv("GMAIL_MACHINE_PASSWORD")
-);
+));
 $mbConfig->setProperty('statHat', new StatHat([
   'ez_key' => getenv("STATHAT_EZKEY"),
   'debug' => getenv("DISABLE_STAT_TRACKING")
