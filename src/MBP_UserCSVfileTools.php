@@ -42,6 +42,7 @@ class MBP_UserCSVfileTools
 
     $this->settings = $this->mbConfig->getProperty('generalSettings');
     $this->statHat = $this->mbConfig->getProperty('statHat');
+    $this->gmail = $this->mbConfig->getProperty('gmail');
   }
 
   /*
@@ -69,37 +70,30 @@ class MBP_UserCSVfileTools
     unset($existingFiles[0]);
     unset($existingFiles[1]);
 
+    $mailbox = $this->gmail->getMailbox('INBOX');
+    $mailboxProcessed = $this->gmail->getMailbox('user-import/niche-processed');
+
     $search = new SearchExpression();
     $search->addCondition(new FromAddress($targetSourceDetails[$source]['from']));
+    $messages = $mailbox->getMessages($search);
 
-    $server = new Server('imap.gmail.com');
-    $connection = $server->authenticate($this->settings['gmail_machine_username'], $this->settings['gmail_machine_password']);
-    $mailbox = $connection->getMailbox($source . '-processed');
+    foreach ($messages as $message) {
+      if ($message->getSubject() == $targetSourceDetails[$source]['subject']) {
 
-    $mailboxes = $connection->getMailboxes();
-    foreach ($mailboxes as $mailbox) {
-      if ($mailbox->getName() == 'INBOX') {
+        $attachments = $message->getAttachments();
+        foreach ($attachments as $attachment) {
 
-        $messages = $mailbox->getMessages($search);
-        foreach ($messages as $message) {
-          if ($message->getSubject() == $targetSourceDetails[$source]['subject']) {
+          $filename = $attachment->getFilename();
+          if (file_exists(__DIR__ . '/../data/' . $source . '/' . $filename) == FALSE) {
 
-            $attachments = $message->getAttachments();
-            foreach ($attachments as $attachment) {
-
-              if (file_exists(__DIR__ . '/../data/' . $source . '/' . $attachment->getFilename()) == FALSE) {
-
-                foreach ($existingFiles as $existingCount => $existingFile) {
-                  if (strpos($existingFile, $attachment->getFilename()) !== FALSE) {
-                    break 2;
-                  }
-                }
-                echo $attachment->getFilename() . ' retrieved from gmail account.', PHP_EOL;
-                file_put_contents(__DIR__ . '/../data/' . $source . '/' . $attachment->getFilename(), $attachment->getDecodedContent());
+            foreach ($existingFiles as $existingCount => $existingFile) {
+              if (strpos($existingFile, $filename) !== FALSE) {
+                break 2;
               }
-
             }
-            $message->move($mailbox);
+            echo $attachment->getFilename() . ' retrieved from gmail account.', PHP_EOL;
+            file_put_contents(__DIR__ . '/../data/' . $source . '/' . $filename, $attachment->getDecodedContent());
+            $message->move($mailboxProcessed);
 
           }
 
