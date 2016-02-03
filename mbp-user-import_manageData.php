@@ -25,7 +25,7 @@ elseif (isset($argv[1])) {
   $source = $argv[1];
 }
 
-$source = validateSource();
+$source = validateSource($source);
 if (!empty($source))  {
     $mbpUserCSVfileTools = new MBP_UserCSVfileTools();
     $status = $mbpUserCSVfileTools->gatherIMAP($source);
