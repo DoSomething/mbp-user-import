@@ -17,7 +17,15 @@ require_once __DIR__ . '/mbp-user-import_manageData.config.inc';
 echo '------- mbp-user-import_manageData START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
 // Kick off
-$source = gatherParameters();
+$source = NULL;
+if (isset($_GET['source'])) {
+  $source = $_GET['source'];
+}
+elseif (isset($argv[1])) {
+  $source = $argv[1];
+}
+
+$source = validateSource();
 if (!empty($source))  {
     $mbpUserCSVfileTools = new MBP_UserCSVfileTools();
     $status = $mbpUserCSVfileTools->gatherIMAP($source);
@@ -31,18 +39,13 @@ echo '------- mbp-user-import_manageData  END: ' . date('j D M Y G:i:s T') . ' -
 /**
  * gatherParameters() - gather parameters set when starting application.
  *
+ * @param string $source
+ *   The name of the source of user data.
+ *
  * @return
  *   $source string: one of the supported source (co-registration) values.
  */
-function gatherParameters() {
-
-  $source = NULL;
-  if (isset($_GET['source'])) {
-    $source = $_GET['source'];
-  }
-  elseif (isset($argv[1])) {
-    $source = $argv[1];
-  }
+function validateSource($source) {
 
   $allowedSources = unserialize(ALLOWED_SOURCES);
   if (!in_array($source, $allowedSources)) {
