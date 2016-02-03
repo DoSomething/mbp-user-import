@@ -22,7 +22,23 @@ require_once __DIR__ . '/mbp-user-import.config.inc';
 echo '------- mbp-user-import START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 try {
 
-  list($targetFile, $source) = gatherParameters();
+  $targetFile = 'nextFile';
+  if (isset($_GET['targetFile'])) {
+    $targetFile = $_GET['targetFile'];
+  }
+  elseif (isset($argv[1])) {
+    $targetFile = $argv[1];
+  }
+
+  $source = NULL;
+  if (isset($_GET['source'])) {
+    $source = $_GET['source'];
+  }
+  elseif (isset($argv[2])) {
+    $source = $argv[2];
+  }
+
+  $source = validateSource($source);
   if (!empty($source))  {
     $mbpUserImport = new MBP_UserImport_Producer();
     $mbpUserImport->produceCSVImport($targetFile, $source);
@@ -42,29 +58,15 @@ echo '------- mbp-user-import END: ' . date('j D M Y G:i:s T') . ' -------', PHP
  * @return
  *   $targetFile string: the name of the file to process or "nextFile" (default).
  *   $source string: one of the supported source (co-registration) values.
+ *
+ *   @param string $source
  */
-function gatherParameters() {
-
-  $targetFile = 'nextFile';
-  if (isset($_GET['targetFile'])) {
-    $targetFile = $_GET['targetFile'];
-  }
-  elseif (isset($argv[1])) {
-    $targetFile = $argv[1];
-  }
-
-  $source = NULL;
-  if (isset($_GET['source'])) {
-    $source = $_GET['source'];
-  }
-  elseif (isset($argv[2])) {
-    $source = $argv[2];
-  }
+function validateSource($source) {
 
   $allowedSources = unserialize(ALLOWED_SOURCES);
   if (!in_array($source, $allowedSources)) {
     die('Invalid source value. Acceptable values: ' . print_r($allowedSources, true));
   }
 
-  return [$targetFile, $source];
+  return $source;
 }
