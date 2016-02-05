@@ -56,7 +56,7 @@ class MBP_UserCSVfileTools
     echo '------- mbp-user-import_manageData->gatherIMAP() ** ' . $source . ' ** START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
     $targetSourceDetails = [
-      'niche' => [
+      'Niche' => [
         'from' => 'no-reply@batchrobot.com',
         'subject' => 'Niche-DoSomething Daily Co-regs',
       ],
