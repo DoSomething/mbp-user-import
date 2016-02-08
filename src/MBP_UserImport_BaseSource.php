@@ -71,6 +71,9 @@ abstract class MBP_UserImport_BaseSource
   
   /**
    * Logic to determine if data from row in CSV file can be processed.
+   *
+   * @param array $data
+   *   Values to test.
    */
   abstract public function canProcess($data);
 
