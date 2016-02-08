@@ -98,19 +98,19 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
   /**
    * Logic to process CSV file based on column / line endings.
    *
-   * @param array $CSVRow
+   * @param array $csvRow
    *   A row of user data from the CSV file.
    *
    * @return array $data
    *   CSV values formatted into an array.
    */
-  public function process($CSVRow) {
+  public function process($csvRow) {
 
-    $CSVData = explode(',', $CSVRow);
+    $csvData = explode(',', $csvRow);
     $data = array();
     foreach ($this->keys as $signupIndex => $signupKey) {
-      if (isset($CSVData[$signupIndex]) && $CSVData[$signupIndex] != '') {
-        $data[$signupKey] = $CSVData[$signupIndex];
+      if (isset($csvData[$signupIndex]) && $csvData[$signupIndex] != '') {
+        $data[$signupKey] = $csvData[$signupIndex];
       }
     }
 
