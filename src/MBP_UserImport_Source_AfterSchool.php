@@ -69,7 +69,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
   public function setter(&$data) {
 
     $message = [];
-    $message['mobile'] = (int) str_replace("'",'', $data['SentToPhone']);
+    $message['mobile'] = str_replace("'",'', $data['SentToPhone']);
 
     $data['SenderName'] = str_replace("'",'', $data['SenderName']);
     $nameBits = explode(' ',$data['SenderName']);
