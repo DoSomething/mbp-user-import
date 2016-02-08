@@ -16,6 +16,8 @@ use DoSomething\MB_Toolbox\MB_Configuration;
 class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
 {
 
+  const USER_COUNTRY = 'US';
+
   /**
    * Supported key / columns in CSV file from source.
    */
@@ -85,7 +87,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
     $message['hs_id'] = (int) str_replace("'",'', $data['SchoolID']);
 
     // All After School users are assumed to be from the United States.
-    $message['user_country'] = 'US';
+    $message['user_country'] = self::USER_COUNTRY;
 
     // Send all numbers to US mobile service
     // Mobile Commons opt-in path when user registers for site

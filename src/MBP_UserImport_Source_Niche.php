@@ -16,6 +16,8 @@ use DoSomething\MB_Toolbox\MB_Configuration;
 class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
 {
 
+  const USER_COUNTRY = 'US';
+
   /**
    * Supported key / columns in CSV file from source.
    */
@@ -58,6 +60,9 @@ class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
    * @param array $data
    *   Values collected from the CSV file for assignment to expected indexes in
    *   the consumer.
+   *
+   * @return boolean
+   *   Did the canProcess test fail or pass.
    */
   public function canProcess($data) {
 
@@ -79,11 +84,14 @@ class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
    *
    * @param array $data
    *   Values collected from the CSV file for assignment to expected indexes in the consumer.
+   *
+   * @return array &$data
+   *   Supplemented $data var with additional settings.
    */
   public function setter(&$data) {
 
     // All niche users are assumed to be from the United States.
-    $data['user_country'] = 'US';
+    $data['user_country'] = self::USER_COUNTRY;
 
     // Send all numbers to US mobile service
     // Mobile Commons opt-in path when user registers for site
