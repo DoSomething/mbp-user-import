@@ -57,7 +57,7 @@ abstract class MBP_UserImport_BaseSource
    * @param array $message
    *   The message to process by the service from the connected queue.
    */
-  public function __construct($message) {
+  public function __construct() {
 
     $this->mbConfig = MB_Configuration::getInstance();
     $this->statHat = $this->mbConfig->getProperty('statHat');
@@ -69,6 +69,16 @@ abstract class MBP_UserImport_BaseSource
    */
   abstract protected function setKeys();
   
+  /**
+   * Logic to determine if data from row in CSV file can be processed.
+   */
+  abstract public function canProcess($data);
+
+  /**
+   * Assign columns specific to the source to common columns expected by the consumer.
+   */
+  abstract public function setter(&$data);
+
   /**
    * Logic to process CSV file based on column / line endings.
    */
