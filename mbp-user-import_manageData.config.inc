@@ -13,7 +13,7 @@ require_once __DIR__ . '/messagebroker-config/mb-secure-config.inc';
 
 define("ALLOWED_SOURCES", serialize([
   'Niche',
-  'afterSchool'
+  'AfterSchool'
 ]));
 
 $mbConfig = MB_Configuration::getInstance();
