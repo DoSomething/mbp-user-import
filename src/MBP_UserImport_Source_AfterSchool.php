@@ -17,6 +17,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
 {
 
   const USER_COUNTRY = 'US';
+  const MOBILE_OPT_IN_PATH_ID = 200527;
 
   /**
    * Supported key / columns in CSV file from source.
@@ -91,7 +92,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
 
     // Send all numbers to US mobile service
     // Mobile Commons opt-in path when user registers for site
-    $message['mobile_opt_in_path_id'] = 164905;
+    $message['mobile_opt_in_path_id'] = self::MOBILE_OPT_IN_PATH_ID;
 
     // Wipe data values with formatted $message values
     $data = $message;
