@@ -72,6 +72,12 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
   public function setter(&$data) {
 
     $message = [];
+    $message['subscribed'] = $data['subscribed'];
+    $message['activity_timestamp'] = $data['activity_timestamp'];
+    $message['application_id'] = $data['application_id'];
+    $message['source'] = $data['source'];
+    $message['source_file'] = $data['source_file'];
+
     $message['mobile'] = str_replace("'",'', $data['SentToPhone']);
 
     $data['SenderName'] = str_replace("'",'', $data['SenderName']);
