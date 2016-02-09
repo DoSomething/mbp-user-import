@@ -16,20 +16,9 @@ use DoSomething\MB_Toolbox\MB_Configuration;
 class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
 {
 
-  /**
-   * A list of supported keys in the CSV file provided by the source.
-   *
-   * @var array
-   */
-  protected $keys;
-
-  /**
-   * Constructor for MBC_UserImport_Cource_niche - create properties based on setKey method.
-   */
-  public function __construct() {
-
-    $this->keys = $this->setKeys();
-  }
+  const USER_COUNTRY = 'US';
+  const MOBILE_OPT_IN_PATH_ID = 164905;
+  const MAILCHIMP_LIST_ID = 'f2fab1dfd4';
 
   /**
    * Supported key / columns in CSV file from source.
@@ -65,7 +54,55 @@ class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
 
     return $keys;
   }
-  
+
+  /**
+   * Assign columns specific to the Niche CSV file to common columns expected
+   * by the consumer.
+   *
+   * @param array $data
+   *   Values collected from the CSV file for assignment to expected indexes in
+   *   the consumer.
+   *
+   * @return boolean
+   *   Did the canProcess test fail or pass.
+   */
+  public function canProcess($data) {
+
+    if (empty($data['email'])) {
+      return false;
+    }
+
+    if (filter_var($data['email'], FILTER_VALIDATE_EMAIL) === false) {
+      echo '- canProcess(), failed FILTER_VALIDATE_EMAIL: ' . $data['email'], PHP_EOL;
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Assign columns specific to the Niche CSV file to common columns expected
+   * by the consumer.
+   *
+   * @param array $data
+   *   Values collected from the CSV file for assignment to expected indexes in the consumer.
+   *
+   * @return array &$data
+   *   Supplemented $data var with additional settings.
+   */
+  public function setter(&$data) {
+
+    // All niche users are assumed to be from the United States.
+    $data['user_country'] = self::USER_COUNTRY;
+
+    // Send all numbers to US mobile service
+    // Mobile Commons opt-in path when user registers for site
+    $data['mobile_opt_in_path_id'] = self::MOBILE_OPT_IN_PATH_ID;
+
+    // General MailChimp list for US users.
+    $data['mailchimp_list_id'] = self::MAILCHIMP_LIST_ID;
+  }
+
   /**
    * Logic to process CSV file based on column / line endings.
    *
@@ -87,16 +124,6 @@ class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
         $data[$signupKey] = $CSVData[$signupIndex];
       }
     }
-
-    // All niche users are assumed to be from the United States.
-    $data['user_country'] = 'US';
-
-    // Send all numbers to US mobile service
-    // Mobile Commons opt-in path when user registers for site
-    $data['mobile_opt_in_path_id'] = '164905';
-
-    // General MailChimp list for US users.
-    $data['mailchimp_list_id'] = 'f2fab1dfd4';
 
     return $data;
   }

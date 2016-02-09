@@ -81,8 +81,8 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
       $targetCSVFileName = $targetFilePaths[count($targetFilePaths) - 1];
     }
     else {
-      $targetCSVFile = __DIR__ . '/../data/' . $source . '/' . $targetCSVFile;
       $targetCSVFileName = $targetCSVFile;
+      $targetCSVFile = __DIR__ . '/../data/' . $source . '/' . $targetCSVFile;
     }
 
     // Is there a file found?
@@ -111,9 +111,10 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
       $data['source'] = $source;
       $data['source_file'] = $targetCSVFileName;
 
-      // email Required, create message for user row
-      if (isset($data['email']) && $data['email'] != '') {
+      // Check for required fields based on the source
+      if ($this->source->canProcess($data)) {
 
+        $this->source->setter($data);
         $payload = parent::generatePayload($data);
         $payload = parent::produceMessage($payload, 'userImport');
         

@@ -60,9 +60,9 @@ class MBP_UserCSVfileTools
         'from' => 'no-reply@batchrobot.com',
         'subject' => 'Niche-DoSomething Daily Co-regs',
       ],
-      'afterSchool' => [
-        'from' => '',
-        'subject' => '',
+      'AfterSchool' => [
+        'from' => 'updates@afterschoolapp.com',
+        'subject' => 'AfterSchool-DoSomething Daily Co-regs',
       ],
     ];
 
