@@ -79,15 +79,16 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
       $targetCSVFile = $this->findNextTargetFile($source);
       $targetFilePaths = explode('/', $targetCSVFile);
       $targetCSVFileName = $targetFilePaths[count($targetFilePaths) - 1];
+      if ($targetCSVFile === false) {
+        throw new Exception('No additional files to be processed.');
+      }
     }
     else {
       $targetCSVFileName = $targetCSVFile;
       $targetCSVFile = __DIR__ . '/../data/' . $source . '/' . $targetCSVFile;
-    }
-
-    // Is there a file found?
-    if ($targetCSVFile == false || !file_exists($targetCSVFile)) {
-      throw new Exception($targetCSVFile . ' not found.');
+      if (!(file_exists($targetCSVFile))) {
+        throw new Exception($targetCSVFileName . ' not found.');
+      }
     }
 
     $signups = file($targetCSVFile);
