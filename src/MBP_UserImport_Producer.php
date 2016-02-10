@@ -106,8 +106,9 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
       $data = $this->source->process($signup);
 
       $data['subscribed'] = 1;
+      $data['activity'] =  'user_import';
       $data['activity_timestamp'] =  time();
-      $data['application_id'] = 100; // Import
+      $data['application_id'] = 'MUI'; // Message Broker User Import
       $data['source'] = $source;
       $data['source_file'] = $targetCSVFileName;
 
