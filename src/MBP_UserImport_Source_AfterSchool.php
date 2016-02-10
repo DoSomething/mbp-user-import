@@ -53,7 +53,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
     // Validate phone number based on the North American Numbering Plan
     // https://en.wikipedia.org/wiki/North_American_Numbering_Plan
     $regex = "/^(\d[\s-]?)?[\(\[\s-]{0,2}?\d{3}[\)\]\s-]{0,2}?\d{3}[\s-]?\d{4}$/i";
-    $mobile = str_replace("'", '', $data['SentToPhone']);
+    $mobile = str_replace('"', '', $data['SentToPhone']);
     if (!(preg_match( $regex, $mobile))) {
       echo '** canProcess(): Invalid phone number based on North American Numbering Plan standard: ' .  $mobile, PHP_EOL;
       return false;
@@ -78,9 +78,9 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
     $message['source'] = $data['source'];
     $message['source_file'] = $data['source_file'];
 
-    $message['mobile'] = str_replace("'",'', $data['SentToPhone']);
+    $message['mobile'] = str_replace('"','', $data['SentToPhone']);
 
-    $data['SenderName'] = str_replace("'",'', $data['SenderName']);
+    $data['SenderName'] = str_replace('"','', $data['SenderName']);
     $nameBits = explode(' ',$data['SenderName']);
     if (count($nameBits) > 1) {
       $message['last_name'] = array_pop($nameBits);
@@ -90,8 +90,8 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
       $message['first_name'] = $nameBits[0];
     }
 
-    $message['hs_name'] = str_replace("'",'', $data['SchoolShort']);
-    $message['hs_id'] = (int) str_replace("'",'', $data['SchoolID']);
+    $message['hs_name'] = str_replace('"','', $data['SchoolShort']);
+    $message['hs_id'] = (int) str_replace('"','', $data['SchoolID']);
 
     // All After School users are assumed to be from the United States.
     $message['user_country'] = self::USER_COUNTRY;
