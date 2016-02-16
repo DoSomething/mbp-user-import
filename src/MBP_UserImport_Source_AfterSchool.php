@@ -18,6 +18,8 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
 
   const USER_COUNTRY = 'US';
   const MOBILE_OPT_IN_PATH_ID = 200527;
+  const AFTERSCHOOL_OPTIN_SINGLE = 'SOLO';
+  const AFTERSCHOOL_OPTIN_DOUBLE = 'PAIR';
 
   /**
    * Supported key / columns in CSV file from source.
@@ -32,7 +34,8 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
       'SchoolName',
       'SchoolShort',
       'SchoolAbbreviation',
-      'Message'
+      'Message',
+      'Optin',
     ];
 
     return $keys;
@@ -90,8 +93,19 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
       $message['first_name'] = $nameBits[0];
     }
 
+    // User profile custom field values
     $message['hs_name'] = str_replace('"','', $data['SchoolShort']);
     $message['hs_id'] = (int) str_replace('"','', $data['SchoolID']);
+    $optin = str_replace('"','', $data['Optin']);
+    if ($optin === 'SINGLE_OPT_IN') {
+      $message['optin'] = self::AFTERSCHOOL_OPTIN_SINGLE;
+    }
+    elseif ($optin === 'DOUBLE_OPT_IN') {
+      $message['optin'] = self::AFTERSCHOOL_OPTIN_DOUBLE;
+    }
+    else {
+      echo '=> WARNING: optin not set, unsupported value: ' . $optin, PHP_EOL;
+    }
 
     // All After School users are assumed to be from the United States.
     $message['user_country'] = self::USER_COUNTRY;
