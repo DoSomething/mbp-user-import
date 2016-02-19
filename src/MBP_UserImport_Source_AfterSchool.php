@@ -95,8 +95,8 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
     }
 
     // User profile custom field values
+    $message['school_name'] = str_replace('"','', $data['SchoolShort']);
     $message['hs_name'] = str_replace('"','', $data['SchoolShort']);
-    $message['hs_id'] = (int) str_replace('"','', $data['SchoolID']);
     $optin = str_replace('"','', $data['Optin']);
     if ($optin === 'SINGLE_OPT_IN') {
       $message['optin'] = self::AFTERSCHOOL_OPTIN_SINGLE;
