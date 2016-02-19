@@ -84,7 +84,8 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
     $message['mobile'] = str_replace('"','', $data['SentToPhone']);
 
     $data['SenderName'] = str_replace('"','', $data['SenderName']);
-    $nameBits = explode(' ',$data['SenderName']);
+    $data['ReceiverName'] = str_replace('"','', $data['ReceiverName']);
+    $nameBits = explode(' ',$data['ReceiverName']);
     if (count($nameBits) > 1) {
       $message['last_name'] = ucfirst(array_pop($nameBits));
       $message['first_name'] = ucwords(implode(' ', $nameBits));
