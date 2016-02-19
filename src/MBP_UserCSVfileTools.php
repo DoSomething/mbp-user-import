@@ -71,7 +71,7 @@ class MBP_UserCSVfileTools
     unset($existingFiles[1]);
 
     $mailbox = $this->gmail->getMailbox('INBOX');
-    $mailboxProcessed = $this->gmail->getMailbox('user-import/niche-processed');
+    $mailboxProcessed = $this->gmail->getMailbox('user-import/' . strtolower($source) . '-processed');
 
     $search = new SearchExpression();
     $search->addCondition(new FromAddress($targetSourceDetails[$source]['from']));
@@ -92,6 +92,7 @@ class MBP_UserCSVfileTools
               }
             }
             echo $attachment->getFilename() . ' retrieved from gmail account.', PHP_EOL;
+            $this->statHat->ezCount('mbp-user-import:  MBP_UserCSVfileTools: gatherIMAP attachment: ' . $source, 1);
             file_put_contents(__DIR__ . '/../data/' . $source . '/' . $filename, $attachment->getDecodedContent());
             $message->move($mailboxProcessed);
 
