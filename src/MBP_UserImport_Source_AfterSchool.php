@@ -86,11 +86,11 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
     $data['SenderName'] = str_replace('"','', $data['SenderName']);
     $nameBits = explode(' ',$data['SenderName']);
     if (count($nameBits) > 1) {
-      $message['last_name'] = array_pop($nameBits);
-      $message['first_name'] = implode(' ', $nameBits);
+      $message['last_name'] = ucfirst(array_pop($nameBits));
+      $message['first_name'] = ucwords(implode(' ', $nameBits));
     }
     else {
-      $message['first_name'] = $nameBits[0];
+      $message['first_name'] = ucfirst($nameBits[0]);
     }
 
     // User profile custom field values
