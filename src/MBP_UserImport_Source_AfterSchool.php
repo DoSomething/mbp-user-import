@@ -98,10 +98,10 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
     $message['school_name'] = str_replace('"','', $data['SchoolShort']);
     $message['hs_name'] = str_replace('"','', $data['SchoolShort']);
     $optin = str_replace('"','', $data['Optin']);
-    if ($optin === 'SINGLE_OPT_IN') {
+    if ($optin == 'SINGLE_OPT_IN') {
       $message['optin'] = self::AFTERSCHOOL_OPTIN_SINGLE;
     }
-    elseif ($optin === 'DOUBLE_OPT_IN') {
+    elseif ($optin == 'DOUBLE_OPT_IN') {
       $message['optin'] = self::AFTERSCHOOL_OPTIN_DOUBLE;
     }
     else {
