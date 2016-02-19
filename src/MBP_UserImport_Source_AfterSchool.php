@@ -138,6 +138,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
       }
     }
 
+    $this->statHat->ezCount('mbp-user-import:  MBP_UserImport_Source_AfterSchool: process', 1);
     return $data;
   }
 
