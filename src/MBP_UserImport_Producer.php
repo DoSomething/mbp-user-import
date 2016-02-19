@@ -101,6 +101,7 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
 
     // Process file contents by row
     $totalSignups = count($signups) - 1;
+    $this->statHat->ezCount('mbp-user-import:  MBP_UserImport_Producer: batchSize', $totalSignups);
     for ($signupCount = 1; $signupCount <= $totalSignups; $signupCount++) {
 
       $signup = $signups[$signupCount];
@@ -133,7 +134,9 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
     // Archive file to prevent processing again and to backup to box.com
     $this->archiveCSV($targetCSVFile);
 
-    echo $this->imported . ' email addresses imported.' . $this->skipped . ' skipped.', PHP_EOL;
+    $this->statHat->ezCount('mbp-user-import:  MBP_UserImport_Producer: imported', $this->imported);
+    $this->statHat->ezCount('mbp-user-import:  MBP_UserImport_Producer: skipped', $this->skipped);
+    echo $this->imported . ' users imported.' . $this->skipped . ' skipped.', PHP_EOL;
     echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
   }
 
