@@ -125,6 +125,7 @@ class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
       }
     }
 
+    $this->statHat->ezCount('mbp-user-import:  MBP_UserImport_Source_Niche: process', 1);
     return $data;
   }
 
