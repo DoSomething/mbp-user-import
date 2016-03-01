@@ -17,7 +17,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
 {
 
   const USER_COUNTRY = 'US';
-  const MOBILE_OPT_IN_PATH_ID = 200527;
+  const MOBILE_OPT_IN_PATH_ID = 201395;
   const AFTERSCHOOL_OPTIN_SINGLE = 'SOLO';
   const AFTERSCHOOL_OPTIN_DOUBLE = 'PAIR';
 
