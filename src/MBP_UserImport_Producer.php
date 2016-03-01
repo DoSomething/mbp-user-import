@@ -91,7 +91,14 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
       }
     }
 
-    $signups = file($targetCSVFile);
+    // Lock file to prevent other processes from using the same file
+    $targetCSVFileLocked = $targetCSVFile . '.locked';
+    $renamed = rename($targetCSVFile, $targetCSVFileLocked);
+    if (!$renamed) {
+      throw new Exception('Failed to lock: ' . $targetCSVFile);
+    }
+
+    $signups = file($targetCSVFileLocked);
 
     // Support files missing line breaks "\n" (Windoz and old OSX). Explode CSV data by line breaks to
     // define each user data row.
@@ -205,8 +212,9 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
    */
   private function archiveCSV($targetCSVFile) {
 
+    $targetCSVFileLocked = $targetCSVFile . '.locked';
     $processedCSVFile = $targetCSVFile . '.' . time();
-    $archived = rename ($targetCSVFile, $processedCSVFile);
+    $archived = rename ($targetCSVFileLocked , $processedCSVFile);
     if ($archived) {
       echo '-> mbp-user-import->archiveCSV(): ' . $targetCSVFile . ' archived.', PHP_EOL;
         // @todo: Move file to box.com
