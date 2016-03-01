@@ -3,7 +3,7 @@
 namespace MBP_UserImport\Test;
 
 /**
- * MBP_UserImportTest: test coverage for  MBP_UserImport class.
+ * MBP_UserImportTest: test coverage for MBP_UserImport class.
  */
 class MBP_UserImportTest extends PHPUnit_Framework_TestCase {
   
