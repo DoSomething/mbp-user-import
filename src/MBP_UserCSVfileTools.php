@@ -107,26 +107,4 @@ class MBP_UserCSVfileTools
 
   }
 
-  /*
-   * Archive import files for long term / archive storage. In doing so rename/move
-   * the CSV file so mbp-user-import can run more than once a day an not process
-   * the same data file more than once.
-   *
-   * @param string $targetCSVFile
-   *   Total number of entries added to the queue.
-   */
-  private function archiveCSV($targetCSVFile) {
-
-    $processedCSVFile = $targetCSVFile . '.' . time();
-    $archived = rename ($targetCSVFile, $processedCSVFile);
-    if ($archived) {
-      echo '-> mbp-user-import->archiveCSV(): ' . $targetCSVFile . ' archived.', "\n";
-        // @todo: Move file to box.com
-    }
-    else {
-      echo '-> ERROR: Failed to archive mbp-user-import->archiveCSV(): ' . $targetCSVFile . '. The file name needs to change to prevent further re-processing of the file on the next run of the script.', "\n";
-    }
-
-  }
-
 }
