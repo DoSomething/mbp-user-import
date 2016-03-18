@@ -1,4 +1,4 @@
-### User Import
+### User Import Ststem
 
 - [Introduction](https://github.com/DoSomething/mbp-user-import/wiki)
 - [Architecture](https://github.com/DoSomething/mbp-user-import/wiki/2.-Architecture)
@@ -20,6 +20,8 @@ An application (consumer) in the Quicksilver (Message Broker) system. Processes 
 Generate reports of the on going user import process. Reports are sent through email and Slack.
 
 ---
+
+## mbp-user-import
 
 ### Installation
 
