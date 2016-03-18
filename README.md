@@ -1,14 +1,17 @@
-https://travis-ci.org/DoSomething/mbp-user-import.svg?branch=master
+####User Import
+
+- [Introduction](https://github.com/DoSomething/mbp-user-import/wiki)
+- [Architecture](https://github.com/DoSomething/mbp-user-import/wiki/2.-Architecture)
+- [Setup](https://github.com/DoSomething/mbp-user-import/wiki/3.-Setup)
+- [Operation](https://github.com/DoSomething/mbp-user-import/wiki/4.-Operation)
+- [Monitoring](https://github.com/DoSomething/mbp-user-import/wiki/5.-Monitoring)
+- [Problems / Solutions](https://github.com/DoSomething/mbp-user-import/wiki/7.-Problems-%5C--Solutions)
 
 mbp-user-import
 ===============
 
-Message Broker - Producer - User import from CVS sources that creates queue entries in the `userImportQueue`.
+An application (producer) in the Quicksilver (Message Broker) system. Imports user data from CVS formatted files that create message entries in the `userImportQueue`.
 
-The work flow of the user import process is:
-- **mbp-user-import_manageData.php** : Gathers CSV user files from gmail account "machines@dosomething.org".
-- **mbp-user-import** : Processes CSV files to generate queue entries in `userImportQueue`.
-- **mbc-user-import.php** : Consumes `userImportQueue` to trigger processing in various systems within the Message Broker system. Details of which functionality is triggered based on the `source` of the user data is explained in the mbc-user-import repository: https://github.com/DoSomething/mbc-user-import.
 
 Installation
 ----------
