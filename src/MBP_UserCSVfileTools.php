@@ -57,7 +57,7 @@ class MBP_UserCSVfileTools
 
     $targetSourceDetails = [
       'Niche' => [
-        'from' => 'no-reply@batchrobot.com',
+        'from' => 'delivery@yourlead.info',
         'subject' => 'Niche-DoSomething Daily Co-regs',
       ],
       'AfterSchool' => [
