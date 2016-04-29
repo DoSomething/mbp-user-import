@@ -164,18 +164,15 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
 
       // Less Stress Text
       case 113728:
-
         $mobileCommonsOptinID = 203783;
         break;
 
       // Planet Zombie - To Be Determined
       case 'TBD':
-
         $mobileCommonsOptinID = 205829;
         break;
 
       default:
-
         throw new Exception('Undefined After School Campaign ID: ' . $afterSchoolCampaignID);
         break;
 
