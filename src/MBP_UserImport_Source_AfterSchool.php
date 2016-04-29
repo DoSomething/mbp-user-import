@@ -168,7 +168,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
         $mobileCommonsOptinID = 203783;
         break;
 
-      // Planet Zombie
+      // Planet Zombie - To Be Determined
       case 'TBD':
 
         $mobileCommonsOptinID = 205829;
