@@ -7,6 +7,7 @@ namespace DoSomething\MBP_UserImport;
 
 use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Configuration;
+use \Exception;
 
 /*
  * MBP_UserImport_Source_Niche: Properties and methods related to the co-marketing partner AfterSchool.
@@ -17,7 +18,6 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
 {
 
   const USER_COUNTRY = 'US';
-  const MOBILE_OPT_IN_PATH_ID = 203783; // Less Stress Text
   const AFTERSCHOOL_OPTIN_SINGLE = 'SOLO';
   const AFTERSCHOOL_OPTIN_DOUBLE = 'PAIR';
 
@@ -36,6 +36,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
       'SchoolAbbreviation',
       'Message',
       'Optin',
+      'CampaignID'
     ];
 
     return $keys;
@@ -94,6 +95,9 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
       $message['first_name'] = ucfirst($nameBits[0]);
     }
 
+    $campaignID = str_replace('"','', $data['CampaignID']);
+    $message['as_campaign_id'] = $campaignID;
+
     // User profile custom field values
     $message['school_name'] = str_replace('"','', $data['SchoolShort']);
     $message['hs_name'] = str_replace('"','', $data['SchoolShort']);
@@ -113,8 +117,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
     $message['user_country'] = self::USER_COUNTRY;
 
     // Send all numbers to US mobile service
-    // Mobile Commons opt-in path when user registers for site
-    $message['mobile_opt_in_path_id'] = self::MOBILE_OPT_IN_PATH_ID;
+    $message['mobile_opt_in_path_id'] = $this->campaignIDtoOptInID($campaignID);
 
     // Wipe data values with formatted $message values
     $data = $message;
@@ -141,6 +144,41 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
 
     $this->statHat->ezCount('mbp-user-import:  MBP_UserImport_Source_AfterSchool: process', 1);
     return $data;
+  }
+
+  /**
+   * campaignIDtoOptInID(): Determine Mobile Commons optin ID based on the After School
+   * campaign ID sent with the user transactional data via CSV file. Throw Exception if lookup
+   * does not have an optin assignment. This will result in the message staying in the queue
+   * and triggering alerts of a new / unknown ID.
+   *
+   * @param integer $afterSchoolCampaignID
+   *   The After School ID sent with the user transactional info.
+   *
+   * @return integer $mobileCommonsOptinID
+   *   The Mobile Commons optin ID to send the user (phone number) to.
+   */
+  private function campaignIDtoOptInID($afterSchoolCampaignID) {
+
+    switch ($afterSchoolCampaignID) {
+
+      // Less Stress Text
+      case 113728:
+        $mobileCommonsOptinID = 203783;
+        break;
+
+      // Planet Zombie - To Be Determined
+      case 'TBD':
+        $mobileCommonsOptinID = 205829;
+        break;
+
+      default:
+        throw new Exception('Undefined After School Campaign ID: ' . $afterSchoolCampaignID);
+        break;
+
+    }
+
+    return $mobileCommonsOptinID;
   }
 
 }
