@@ -96,13 +96,13 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
     }
 
     $campaignID = str_replace('"','', $data['CampaignID']);
+    $campaignID = str_replace("\n",'', $campaignID);
     $message['as_campaign_id'] = $campaignID;
 
     // User profile custom field values
     $message['school_name'] = str_replace('"','', $data['SchoolShort']);
     $message['hs_name'] = str_replace('"','', $data['SchoolShort']);
     $optin = str_replace('"','', $data['Optin']);
-    $optin = str_replace("\n",'', $optin);
     if ($optin == 'SINGLE_OPT_IN') {
       $message['optin'] = self::AFTERSCHOOL_OPTIN_SINGLE;
     }
