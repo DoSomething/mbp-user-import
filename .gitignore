@@ -14,3 +14,7 @@ tests/phpunit.xml
 # Ignor .csv import files
 *.csv
 /data/
+
+# PHPStorm
+.idea
+
