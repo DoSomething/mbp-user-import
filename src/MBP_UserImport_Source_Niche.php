@@ -114,10 +114,7 @@ class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
    */
   public function process($CSVRow) {
 
-    $CSVRow = str_replace('"', '',  $CSVRow);
-    $CSVRow = str_replace("\r\n", '',  $CSVRow);
-    $CSVData = explode(',', $CSVRow);
-
+    $CSVData = str_getcsv($CSVRow);
     $data = array();
     foreach ($this->keys as $signupIndex => $signupKey) {
       if (isset($CSVData[$signupIndex]) && $CSVData[$signupIndex] != '') {
