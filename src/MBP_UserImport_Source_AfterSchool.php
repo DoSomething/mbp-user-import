@@ -82,10 +82,10 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
     $message['source'] = $data['source'];
     $message['source_file'] = $data['source_file'];
 
-    $message['mobile'] = str_replace('"','', $data['SentToPhone']);
+    $message['mobile'] = $data['SentToPhone'];
 
-    $data['SenderName'] = str_replace('"','', $data['SenderName']);
-    $data['ReceiverName'] = str_replace('"','', $data['ReceiverName']);
+    $data['SenderName'] = $data['SenderName'];
+    $data['ReceiverName'] = $data['ReceiverName'];
     $nameBits = explode(' ',$data['ReceiverName']);
     if (count($nameBits) > 1) {
       $message['last_name'] = ucfirst(array_pop($nameBits));
@@ -95,14 +95,13 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
       $message['first_name'] = ucfirst($nameBits[0]);
     }
 
-    $campaignID = str_replace('"','', $data['CampaignID']);
-    $campaignID = str_replace("\n",'', $campaignID);
+    $campaignID = $data['CampaignID'];
     $message['as_campaign_id'] = $campaignID;
 
     // User profile custom field values
-    $message['school_name'] = str_replace('"','', $data['SchoolShort']);
-    $message['hs_name'] = str_replace('"','', $data['SchoolShort']);
-    $optin = str_replace('"','', $data['Optin']);
+    $message['school_name'] = $data['SchoolShort'];
+    $message['hs_name'] = $data['SchoolShort'];
+    $optin = $data['Optin'];
     if ($optin == 'SINGLE_OPT_IN') {
       $message['optin'] = self::AFTERSCHOOL_OPTIN_SINGLE;
     }
@@ -134,7 +133,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
    */
   public function process($csvRow) {
 
-    $csvData = explode('","', $csvRow);
+    $csvData  = str_getcsv($csvRow);
     $data = array();
     foreach ($this->keys as $signupIndex => $signupKey) {
       if (isset($csvData[$signupIndex]) && $csvData[$signupIndex] != '') {
