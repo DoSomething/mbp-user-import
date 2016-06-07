@@ -134,7 +134,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
    */
   public function process($csvRow) {
 
-    $csvData = explode(',', $csvRow);
+    $csvData = explode('","', $csvRow);
     $data = array();
     foreach ($this->keys as $signupIndex => $signupKey) {
       if (isset($csvData[$signupIndex]) && $csvData[$signupIndex] != '') {
@@ -168,7 +168,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
         break;
 
       // Planet Zombie - To Be Determined
-      case '120470':
+      case 120470:
         $mobileCommonsOptinID = 205829;
         break;
 
