@@ -1,19 +1,22 @@
 # Ignore configuration files that may contain sensitive information.
 /messagebroker-config
 
-# Ignor composer working files
+# Ignore composer working files
 composer.lock
 /vendor/
 
-# Ignor testing working files
+# Ignore testing working files
 tests/phpunit.xml
 
-# Ignor OSX system files
+# Ignore OSX system files
 .DS_Store
 
-# Ignor .csv import files
+# Ignore .csv import files
 *.csv
 /data/
+
+# Ignore NPM magic
+node_modules
 
 # PHPStorm
 .idea
