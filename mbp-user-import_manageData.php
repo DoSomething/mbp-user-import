@@ -20,30 +20,47 @@ echo '------- mbp-user-import_manageData START: ' . date('j D M Y G:i:s T') . ' 
 $source = NULL;
 if (isset($_GET['source'])) {
   $source = $_GET['source'];
-}
-elseif (isset($argv[1])) {
+} elseif (isset($argv[1])) {
   $source = $argv[1];
 }
 
 $source = validateSource($source);
 if (!empty($source))  {
-    $mbpUserCSVfileTools = new MBP_UserCSVfileTools();
-    $status = $mbpUserCSVfileTools->gatherIMAP($source);
-}
-else {
+
+  switch ($source) {
+
+    case 'Northstar':
+
+      $mbpNorthstarTools = new MBP_NorthstarTools();
+      $status = $mbpNorthstarTools->gatherMobileUsers();
+      break;
+
+    case 'Niche':
+    case 'AfterSchool':
+
+      $mbpUserCSVfileTools = new MBP_UserCSVfileTools();
+      $status = $mbpUserCSVfileTools->gatherIMAP($source);
+      break;
+
+    default:
+
+      echo 'Source setting passed validation but is not defined: ' . $source, PHP_EOL;
+      break;
+
+  }
+
+} else {
   echo '"source" parameter not defined.', PHP_EOL;
 }
 
 echo '------- mbp-user-import_manageData  END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
 /**
- * gatherParameters() - gather parameters set when starting application.
+ * Validate that source settings is valid.
  *
- * @param string $source
- *   The name of the source of user data.
+ * @param string $source The name of the source of user data.
  *
- * @return
- *   $source string: one of the supported source (co-registration) values.
+ * @return string $source string: one of the supported source (co-registration) values.
  */
 function validateSource($source) {
 
