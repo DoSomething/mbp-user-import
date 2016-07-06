@@ -171,6 +171,11 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
         $mobileCommonsOptinID = 205829;
         break;
 
+      // Don't Drive Intexticated (DDI)
+      case 162474:
+        $mobileCommonsOptinID = 209193;
+        break;
+
       default:
         throw new Exception('Undefined After School Campaign ID: ' . $afterSchoolCampaignID);
         break;
