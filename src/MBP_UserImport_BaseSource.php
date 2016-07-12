@@ -21,35 +21,35 @@ abstract class MBP_UserImport_BaseSource
    *
    * @var object
    */
-  protected $mbConfig;
+    protected $mbConfig;
 
   /**
    * StatHat object for logging of activity
    *
    * @var object
    */
-  protected $statHat;
+    protected $statHat;
   
   /**
    * A list of supported keys in the CSV file provided by the source.
    *
    * @var array
    */
-  protected $keys;
+    protected $keys;
   
   /**
    * The number of user rows from CSV file processed.
    *
    * @var integer
    */
-  protected $imported = 0;
+    protected $imported = 0;
   
   /**
    * The number of user rows skipped from CSV file when processing.
    *
    * @var integer
    */
-  protected $skipped = 0;
+    protected $skipped = 0;
 
   /**
    * Constructor for MBC_BaseConsumer - all consumer applications should extend this base class.
@@ -57,17 +57,18 @@ abstract class MBP_UserImport_BaseSource
    * @param array $message
    *   The message to process by the service from the connected queue.
    */
-  public function __construct() {
+    public function __construct()
+    {
 
-    $this->mbConfig = MB_Configuration::getInstance();
-    $this->statHat = $this->mbConfig->getProperty('statHat');
-    $this->keys = $this->setKeys();
-  }
+        $this->mbConfig = MB_Configuration::getInstance();
+        $this->statHat = $this->mbConfig->getProperty('statHat');
+        $this->keys = $this->setKeys();
+    }
 
   /**
    * Supported key / columns in CSV file from source.
    */
-  abstract protected function setKeys();
+    abstract protected function setKeys();
   
   /**
    * Logic to determine if data from row in CSV file can be processed.
@@ -75,16 +76,15 @@ abstract class MBP_UserImport_BaseSource
    * @param array $data
    *   Values to test.
    */
-  abstract public function canProcess($data);
+    abstract public function canProcess($data);
 
   /**
    * Assign columns specific to the source to common columns expected by the consumer.
    */
-  abstract public function setter(&$data);
+    abstract public function setter(&$data);
 
   /**
    * Logic to process CSV file based on column / line endings.
    */
-  abstract public function process($data);
-
+    abstract public function process($data);
 }
