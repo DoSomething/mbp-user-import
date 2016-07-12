@@ -12,7 +12,7 @@
 use DoSomething\MBP_UserImport\MBP_UserImport_Producer;
 
 date_default_timezone_set('America/New_York');
-define('CONFIG_PATH',  __DIR__ . '/messagebroker-config');
+define('CONFIG_PATH', __DIR__ . '/messagebroker-config');
 
 // Load up the Composer autoload magic
 require_once __DIR__ . '/vendor/autoload.php';
@@ -21,34 +21,29 @@ require_once __DIR__ . '/mbp-user-import.config.inc';
 // Kickoff
 echo '------- mbp-user-import START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 try {
+    $targetFile = 'nextFile';
+    if (isset($_GET['targetFile'])) {
+        $targetFile = $_GET['targetFile'];
+    } elseif (isset($argv[1])) {
+        $targetFile = $argv[1];
+    }
 
-  $targetFile = 'nextFile';
-  if (isset($_GET['targetFile'])) {
-    $targetFile = $_GET['targetFile'];
-  }
-  elseif (isset($argv[1])) {
-    $targetFile = $argv[1];
-  }
+    $source = null;
+    if (isset($_GET['source'])) {
+        $source = $_GET['source'];
+    } elseif (isset($argv[2])) {
+        $source = $argv[2];
+    }
 
-  $source = NULL;
-  if (isset($_GET['source'])) {
-    $source = $_GET['source'];
-  }
-  elseif (isset($argv[2])) {
-    $source = $argv[2];
-  }
-
-  $source = validateSource($source);
-  if (!empty($source))  {
-    $mbpUserImport = new MBP_UserImport_Producer();
-    $mbpUserImport->produceCSVImport($targetFile, $source);
-  }
-  else {
-    throw new Exception('"source" parameter not defined.');
-  }
-}
-catch(Exception $e) {
-  echo $e->getMessage(), PHP_EOL;
+    $source = validateSource($source);
+    if (!empty($source)) {
+        $mbpUserImport = new MBP_UserImport_Producer();
+        $mbpUserImport->produceCSVImport($targetFile, $source);
+    } else {
+        throw new Exception('"source" parameter not defined.');
+    }
+} catch (Exception $e) {
+    echo $e->getMessage(), PHP_EOL;
 }
 echo '------- mbp-user-import END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
@@ -61,12 +56,13 @@ echo '------- mbp-user-import END: ' . date('j D M Y G:i:s T') . ' -------', PHP
  *
  *   @param string $source
  */
-function validateSource($source) {
+function validateSource($source)
+{
 
-  $allowedSources = unserialize(ALLOWED_SOURCES);
-  if (!in_array($source, $allowedSources)) {
-    die('Invalid source value. Acceptable values: ' . print_r($allowedSources, true));
-  }
+    $allowedSources = unserialize(ALLOWED_SOURCES);
+    if (!in_array($source, $allowedSources)) {
+        die('Invalid source value. Acceptable values: ' . print_r($allowedSources, true));
+    }
 
-  return $source;
+    return $source;
 }
