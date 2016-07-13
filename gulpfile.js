@@ -32,13 +32,13 @@ var shell   = require('gulp-shell');
  * documented and with drastically less bugs.
  */
 gulp.task('phplint', function (cb) {
-    phplint(['./**/*.php', '!./node_modules/**/*', '!./vendor/**/*'],  { limit: 10 }, function (err, stdout, stderr) {
-      if (err) {
-        cb(err);
-        process.exit(1);
-      }
-      cb();
-    });
+  phplint(['./**/*.php', '!./node_modules/**/*', '!./vendor/**/*'],  { limit: 10 }, function (err, stdout, stderr) {
+    if (err) {
+      cb(err);
+      process.exit(1);
+    }
+    cb();
+  });
 });
 
 /**
@@ -50,13 +50,13 @@ gulp.task('phplint', function (cb) {
  * Installed with Composer: https://phpunit.de/manual/current/en/installation.html#installation.composer
  */
 gulp.task('phpunit', function () {
-    var options = {debug: false, notify: true};
-    gulp.src('phpunit.xml')
-      .pipe(phpunit('vendor/bin/phpunit --verbose tests', options))
-      .on('error', notify.onError({
-        title: "Failed Tests!",
-        message: "Error(s) occurred during testing..."
-      }));
+  var options = {debug: false, notify: true};
+  gulp.src('phpunit.xml')
+    .pipe(phpunit('vendor/bin/phpunit --verbose tests', options))
+    .on('error', notify.onError({
+      title: "Failed Tests!",
+      message: "Error(s) occurred during testing..."
+    }));
 });
 
 /**
@@ -69,18 +69,18 @@ gulp.task('phpunit', function () {
  * clean and consistent.
  */
 gulp.task('phpcs', function () {
-    return gulp.src(['./**/*.php', './**/*.inc', 'bin', '!./messagebroker-config/**/*', '!./node_modules/', '!./vendor/**/*'])
-        .pipe(phpcs({
-            bin: 'vendor/bin/phpcs',
-            standard: 'ruleset.xml',
-            warningSeverity: 0,
-            showSniffCode: 1,
-            colors: 1
-        }))
-        .pipe(phpcs.reporter('log'));
+  return gulp.src(['./**/*.php', './**/*.inc', 'bin', '!./messagebroker-config/**/*', '!./node_modules/', '!./vendor/**/*'])
+    .pipe(phpcs({
+      bin: 'vendor/bin/phpcs',
+      standard: 'ruleset.xml',
+      warningSeverity: 0,
+      showSniffCode: 1,
+      colors: 1
+    }))
+    .pipe(phpcs.reporter('log'));
 });
 
-gulp.task('phpcbf', shell.task(['vendor/bin/phpcbf --standard=PSR2 --ignore=vendor/,node_modules/,messagebroker-config src mbc-user-import.php mbc-user-import.config.inc']));
+gulp.task('phpcbf', shell.task(['vendor/bin/phpcbf --standard=PSR2 --ignore=vendor/,node_modules/,messagebroker-config src mbp-user-import.php mbp-user-import.config.inc']));
 
 /**
  * watch (Gulp): https://github.com/gulpjs/gulp
@@ -90,7 +90,7 @@ gulp.task('phpcbf', shell.task(['vendor/bin/phpcbf --standard=PSR2 --ignore=vend
 gulp.task('watch', function () {
   gulp.watch(['composer.json', 'phpunit.xml', './**/*.php', './**/*.inc', '!./messagebroker-config/**/*', '!./vendor/**/*', '!./node_modules/**/*'],
     function (event) {
-        console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+      console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
     });
   gulp.watch('composer.json', ['dump-autoload']);
   gulp.watch(['phpunit.xml', './**/*.php', './**/*.inc', '!messagebroker-config/', '!vendor/**/*', '!node_modules/**/*'], ['phplint', 'phpunit']);
