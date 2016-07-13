@@ -12,10 +12,21 @@
 use DoSomething\MBP_UserImport\MBP_UserImport_Producer;
 
 date_default_timezone_set('America/New_York');
-define('CONFIG_PATH',  __DIR__ . '/messagebroker-config');
+define('CONFIG_PATH', __DIR__ . '/messagebroker-config');
+
+// Manage enviroment setting
+if (isset($_GET['enviroment']) && allowedEnviroment($_GET['enviroment'])) {
+    define('ENVIROMENT', $_GET['enviroment']);
+} elseif (isset($argv[1])&& allowedEnviroment($argv[1])) {
+    define('ENVIROMENT', $argv[1]);
+} elseif (allowedEnviroment('local')) {
+    define('ENVIROMENT', 'local');
+}
 
 // Load up the Composer autoload magic
 require_once __DIR__ . '/vendor/autoload.php';
+
+// Load configuration settings specific to this application
 require_once __DIR__ . '/mbp-user-import.config.inc';
 
 // Kickoff
