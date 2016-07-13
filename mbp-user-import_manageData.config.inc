@@ -9,7 +9,7 @@ use DoSomething\StatHat\Client as StatHat;
 
 // Load configuration settings common to the Message Broker system
 // symlinks in the project directory point to the actual location of the files
-require_once __DIR__ . '/messagebroker-config/mb-secure-config.inc';
+require_once CONFIG_PATH . '/mb-secure-config/' . ENVIROMENT . '/mb-secure-config.inc';
 
 define("ALLOWED_SOURCES", serialize([
   'Niche',
