@@ -4,6 +4,7 @@
  */
  
 use DoSomething\MB_Toolbox\MB_Configuration;
+use DoSomething\MB_Toolbox\MB_RabbitMQManagementAPI;
 use DoSomething\StatHat\Client as StatHat;
 
 // Load configuration settings common to the Message Broker system
