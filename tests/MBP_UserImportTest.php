@@ -57,10 +57,10 @@ class MBP_UserImportTest extends \PHPUnit_Framework_TestCase {
     /**
      * Ensure mbConfig->getProperty returns a value.
      *
-     * @covers \DoSomething\MBC_UserImport\MBC_UserImport_Consumer::__construct
-     * @uses   \DoSomething\MBC_UserImport\MBC_UserImport_Consumer
+     * @covers \DoSomething\MBP_UserImport\MBP_UserImport_Producer::__construct
+     * @uses   \DoSomething\MBP_UserImport\MBP_UserImport_Producer
      */
-    public function testMBCUserImportConfigProperties()
+    public function testMBPUserImportConfigProperties()
     {
         $statHat = $this->mbConfig->getProperty('statHat');
         $this->assertEquals(true, is_object($statHat));
@@ -79,10 +79,10 @@ class MBP_UserImportTest extends \PHPUnit_Framework_TestCase {
     /**
      * Ensure mbConfig->getProperty returns expected value types.
      *
-     * @covers \DoSomething\MBC_UserImport\MBC_UserImport_Consumer::__construct
-     * @uses   \DoSomething\MBC_UserImport\MBC_UserImport_Consumer
+     * @covers \DoSomething\MBP_UserImport\MBP_UserImport_Producer::__construct
+     * @uses   \DoSomething\MBP_UserImport\MBP_UserImport_Producer
      */
-    public function testMBCUserImportConfigPropertyTypes()
+    public function testMBPUserImportConfigPropertyTypes()
     {
 
         $statHat = $this->mbConfig->getProperty('statHat');
