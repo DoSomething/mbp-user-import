@@ -19,6 +19,11 @@ define("ALLOWED_SOURCES", serialize([
 
 $mbConfig = MB_Configuration::getInstance();
 
+$mbConfig->setProperty('statHat', new StatHat([
+    'ez_key' => getenv("STATHAT_EZKEY"),
+    'debug' => getenv("DISABLE_STAT_TRACKING")
+]));
+
 // Settings
 $mbConfig->setProperty('rabbit_credentials', [
   'host' =>  getenv("RABBITMQ_HOST"),
@@ -45,8 +50,3 @@ $mbConfig->setProperty('messageBrokerLogging', new MessageBroker($rabbitCredenti
 
 $mbRabbitConfig = $mbConfig->constructRabbitConfig('directDeadLetterExchange', ['deadLetterQueue']);
 $mbConfig->setProperty('messageBroker_deadLetter', new MessageBroker($rabbitCredentials, $mbRabbitConfig));
-
-$mbConfig->setProperty('statHat', new StatHat([
-  'ez_key' => getenv("STATHAT_EZKEY"),
-  'debug' => getenv("DISABLE_STAT_TRACKING")
-]));
