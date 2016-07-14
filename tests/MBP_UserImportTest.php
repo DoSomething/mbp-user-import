@@ -3,7 +3,7 @@
  * Test coverage for mbp-user-import.php and mbp-user-import.config.inc. Starting
  * point for mbp-user-import application.
  */
-namespace DoSomething\MBC_UserImport;
+namespace DoSomething\MBP_UserImport;
 
 use DoSomething\MB_Toolbox\MB_Configuration;
 
@@ -22,7 +22,7 @@ class MBP_UserImportTest extends \PHPUnit_Framework_TestCase {
      */
     public function setUp()
     {
-        require_once __DIR__ . '/../mbc-user-import.config.inc';
+        require_once __DIR__ . '/../mbp-user-import.config.inc';
         $this->mbConfig = MB_Configuration::getInstance();
     }
 
@@ -32,8 +32,8 @@ class MBP_UserImportTest extends \PHPUnit_Framework_TestCase {
     public function testFindNextTargetFile()
     {
 
-    // Create  MBP_UserImport object to access findNextTargetFile() method for testing
-    $mbpUserImport = new MBP_UserImport();
+    // Create  MBP_UserImport_Producer object to access findNextTargetFile() method for testing
+    $mbpUserImport = new MBP_UserImport_Producer();
     
     /*
     foreach ($sources as $source) {
