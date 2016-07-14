@@ -26,6 +26,13 @@ $mbConfig->setProperty('rabbit_credentials', [
   'password' => getenv("RABBITMQ_PASSWORD"),
   'vhost' => getenv("RABBITMQ_VHOST"),
 ]);
+$mbConfig->setProperty('mbRabbitMQManagementAPI', new MB_RabbitMQManagementAPI([
+    'domain' => getenv("MB_RABBITMQ_MANAGEMENT_API_HOST"),
+    'port' => getenv('MB_RABBITMQ_MANAGEMENT_API_PORT'),
+    'vhost' => getenv('MB_RABBITMQ_MANAGEMENT_API_VHOST'),
+    'username' => getenv('MB_RABBITMQ_MANAGEMENT_API_USERNAME'),
+    'password' => getenv('MB_RABBITMQ_MANAGEMENT_API_PASSWORD')
+]));
 
 $mbRabbitConfig = $mbConfig->constructRabbitConfig('directUserImport', ['userImportQueue']);
 $rabbitCredentials = $mbConfig->getProperty('rabbit_credentials');
