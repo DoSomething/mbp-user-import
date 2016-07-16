@@ -144,6 +144,28 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
         echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
     }
 
+    /*
+     * Create entries in userImportQueue of mobile user data gathered from Northstar.
+     *
+     * @param array $mobileSignups Details of mobile user signups
+     *
+     * @return boolean
+     */
+    public function produceNorthstarMobileUsers($mobileSignups)
+    {
+
+        $this->imported = '';
+        $this->skipped = '';
+
+        foreach($mobileSignups as $mobileSignup) {
+
+        }
+
+        echo '------- MBP_UserImport_Producer->produceNorthstarMobileUsers() END - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
+
+        return $status;
+    }
+
   /*
    * Gather next file name to process based on the define source..
    *
