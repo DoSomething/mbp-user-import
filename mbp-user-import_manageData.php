@@ -7,6 +7,8 @@
  */
 
 use DoSomething\MBP_UserImport\MBP_UserCSVfileTools;
+use DoSomething\MBP_UserImport\MBP_NorthstarTools;
+use DoSomething\MBP_UserImport\MBP_UserImport_Producer;
 
 date_default_timezone_set('America/New_York');
 define('CONFIG_PATH', __DIR__ . '/messagebroker-config');
@@ -41,7 +43,9 @@ if (!empty($source)) {
     switch ($source) {
         case 'Northstar':
             $mbpNorthstarTools = new MBP_NorthstarTools();
-            $status = $mbpNorthstarTools->gatherMobileUsers();
+            $mobileSignups = $mbpNorthstarTools->gatherMobileUsers();
+            $mbpUserImportProducer = new MBP_UserImport_Producer();
+            $status = $mbpUserImportProducer->produceNorthstarMobileUsers($mobileSignups);
             break;
 
         case 'Niche':
