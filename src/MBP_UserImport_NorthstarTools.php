@@ -8,6 +8,7 @@
 namespace DoSomething\MBP_UserImport;
 
 use DoSomething\MB_Toolbox\MB_Configuration;
+use DoSomething\MB_Toolbox\MB_Toolbox_cURL;
 use DoSomething\StatHat\Client as StatHat;
 use \Exception;
 
@@ -16,6 +17,10 @@ use \Exception;
  */
 class MBP_UserImport_NorthstarTools
 {
+    /*
+     * The version of the Northstar API
+     */
+    const NORTHSTAR_API_VERSION = 'v1';
 
     /**
      * Configuration settings loaded from singleton instances.
@@ -30,6 +35,13 @@ class MBP_UserImport_NorthstarTools
      * @var array
      */
     private $settings;
+
+    /**
+     * Configuration settings for connecting to Northstar API.
+     *
+     * @var array
+     */
+    private $northstarAPIConfig;
 
     /**
      * Logging script activity.
@@ -48,6 +60,7 @@ class MBP_UserImport_NorthstarTools
         $this->mbConfig = MB_Configuration::getInstance();
 
         $this->settings = $this->mbConfig->getProperty('generalSettings');
+        $this->northstarAPIConfig = $this->mbConfig->getProperty('northstar_config');
         $this->statHat = $this->mbConfig->getProperty('statHat');
     }
 
@@ -63,10 +76,64 @@ class MBP_UserImport_NorthstarTools
 
         echo '------- MBP_UserImport_NorthstarTools->MobileUsers() START - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
-        $mobileSignups[] = [
-            'mobile' => '',
+        $page = 0;
+        $mobileSignups = [];
+        $targetSources = [
+            'mobileapp-iphone',
+            'mobileapp-android'
         ];
 
+        // Gather all mobile user data which based on all source types
+        foreach ($targetSources as $source) {
+
+            do {
+
+                $page++;
+                $results = $this->getNorthstarData($source, $page);
+                $totalPages = $results->meta->pagination['total_pages'];
+
+                foreach ($results->data as $result) {
+
+                    $mobileSignups[] = [
+                        'mobile' => '',
+                    ];
+
+                }
+
+            } while($page < $totalPages);
+
+        }
+
         return $mobileSignups;
+    }
+
+    /**
+     * Using cURL request, gather all mobile user signups from Northstar.
+     *
+     * @param string $source Various types of sources of mobile user signups.
+     * @param integer $page  Page through GET request results based on limit parameter in GET request.
+     *
+     * @return object
+     */
+    private function getNorthstarData($source, $page) {
+
+        if (empty($this->northstarAPIConfig['host'])) {
+            throw new Exception('MBP_UserImport_NorthstarTools->getNorthstarData() northstar_config ' .
+                'missing host setting.');
+        }
+
+        $northstarUrl =  $this->northstarAPIConfig['host'];
+        $port = $this->northstarAPIConfig['port'];
+        if ($port > 0 && is_numeric($port)) {
+            $northstarUrl .= ':' . $port;
+        }
+
+        // Build query based on endpoint specs:
+        $northstarUrl .= '/' . self::NORTHSTAR_API_VERSION . '/users
+                    ?search[source]=' . $source .
+            '&limit=100&page=' . $page;
+        $results = $this->mbToolboxcURL->curlGET($northstarUrl);
+
+        return $results;
     }
 }
