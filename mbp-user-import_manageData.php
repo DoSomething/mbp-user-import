@@ -14,12 +14,14 @@ date_default_timezone_set('America/New_York');
 define('CONFIG_PATH', __DIR__ . '/messagebroker-config');
 
 // Manage enviroment setting
-if (isset($_GET['enviroment']) && allowedEnviroment($_GET['enviroment'])) {
-    define('ENVIROMENT', $_GET['enviroment']);
+if (isset($_GET['environment']) && allowedEnviroment($_GET['environment'])) {
+    define('ENVIRONMENT', $_GET['environment']);
 } elseif (isset($argv[1])&& allowedEnviroment($argv[1])) {
-    define('ENVIROMENT', $argv[1]);
+    define('ENVIRONMENT', $argv[1]);
+} elseif ($env = loadConfig()) {
+    echo 'environment.php exists, ENVIRONMENT defined as: ' . ENVIRONMENT, PHP_EOL;
 } elseif (allowedEnviroment('local')) {
-    define('ENVIROMENT', 'local');
+    define('ENVIRONMENT', 'local');
 }
 
 // Load up the Composer autoload magic
@@ -65,19 +67,40 @@ if (!empty($source)) {
 echo '------- mbp-user-import_manageData  END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
 /**
- * Validate that source settings is valid.
+ * Test if environment setting is a supported value.
  *
- * @param string $source The name of the source of user data.
+ * @param string $setting Requested enviroment setting.
  *
- * @return string $source string: one of the supported source (co-registration) values.
+ * @return boolean
  */
-function validateSource($source)
+function allowedEnviroment($setting)
 {
 
-    $allowedSources = unserialize(ALLOWED_SOURCES);
-    if (!in_array($source, $allowedSources)) {
-        die('Invalid source value. Acceptable values: ' . print_r($allowedSources, true));
+    $allowedEnviroments = [
+        'local',
+        'dev',
+        'prod'
+    ];
+
+    if (in_array($setting, $allowedEnviroments)) {
+        return true;
     }
 
-    return $source;
+    return false;
+}
+
+/**
+ * Gather configuration settings for current application enviroment.
+ *
+ * @return boolean
+ */
+function loadConfig() {
+
+    // Check that environment config file exists
+    if (!file_exists (enviroment.php)) {
+        return false;
+    }
+    include('./environment.php');
+
+    return true;
 }

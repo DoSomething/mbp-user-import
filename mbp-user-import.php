@@ -2,8 +2,8 @@
 /**
  * mbp-user-import.php
  *
- * Import user data from CSV file supplied by niche.com of users interested in
- * DoSomething scholarships. Entries in the userImportQueue will be consumed by
+ * Import user data from CSV file supplied by supported sources of users interested
+ * in DoSomething.org. Entries in the userImportQueue will be consumed by
  * mbc-user-import consumer. User creation in the Drupal website as well as the
  * userAPI, Mailchimp and Mandrill transactional signup email message will be
  * triggered by each entry.
@@ -15,12 +15,14 @@ date_default_timezone_set('America/New_York');
 define('CONFIG_PATH', __DIR__ . '/messagebroker-config');
 
 // Manage enviroment setting
-if (isset($_GET['enviroment']) && allowedEnviroment($_GET['enviroment'])) {
-    define('ENVIROMENT', $_GET['enviroment']);
+if (isset($_GET['environment']) && allowedEnviroment($_GET['environment'])) {
+    define('ENVIRONMENT', $_GET['environment']);
 } elseif (isset($argv[1])&& allowedEnviroment($argv[1])) {
-    define('ENVIROMENT', $argv[1]);
+    define('ENVIRONMENT', $argv[1]);
+} elseif ($env = loadConfig()) {
+    echo 'environment.php exists, ENVIRONMENT defined as: ' . ENVIRONMENT, PHP_EOL;
 } elseif (allowedEnviroment('local')) {
-    define('ENVIROMENT', 'local');
+    define('ENVIRONMENT', 'local');
 }
 
 // Load up the Composer autoload magic
@@ -59,21 +61,40 @@ try {
 echo '------- mbp-user-import END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
 /**
- * gatherParameters() - gather parameters set when starting application.
+ * Test if environment setting is a supported value.
  *
- * @return
- *   $targetFile string: the name of the file to process or "nextFile" (default).
- *   $source string: one of the supported source (co-registration) values.
+ * @param string $setting Requested enviroment setting.
  *
- *   @param string $source
+ * @return boolean
  */
-function validateSource($source)
+function allowedEnviroment($setting)
 {
 
-    $allowedSources = unserialize(ALLOWED_SOURCES);
-    if (!in_array($source, $allowedSources)) {
-        die('Invalid source value. Acceptable values: ' . print_r($allowedSources, true));
+    $allowedEnviroments = [
+        'local',
+        'dev',
+        'prod'
+    ];
+
+    if (in_array($setting, $allowedEnviroments)) {
+        return true;
     }
 
-    return $source;
+    return false;
+}
+
+/**
+ * Gather configuration settings for current application enviroment.
+ *
+ * @return boolean
+ */
+function loadConfig() {
+
+    // Check that environment config file exists
+    if (!file_exists (enviroment.php)) {
+        return false;
+    }
+    include('./environment.php');
+
+    return true;
 }
