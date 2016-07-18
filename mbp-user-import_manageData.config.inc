@@ -30,3 +30,10 @@ $mbConfig->setProperty('gmail', $emailServer->authenticate(
     getenv("GMAIL_MACHINE_USERNAME"),
     getenv("GMAIL_MACHINE_PASSWORD")
 ));
+
+// Northstar
+$mbConfig->setProperty('northstar_config', [
+    'host' => getenv("NORTHSTAR_API_HOST"),
+    'id' => getenv("NORTHSTAR_API_ID"),
+    'key' => getenv('NORTHSTAR_API_KEY'),
+]);
