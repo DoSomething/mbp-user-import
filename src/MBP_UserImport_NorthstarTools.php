@@ -14,7 +14,7 @@ use \Exception;
 /**
  *
  */
-class MBP_NorthstarTools
+class MBP_UserImport_NorthstarTools
 {
 
   /**
