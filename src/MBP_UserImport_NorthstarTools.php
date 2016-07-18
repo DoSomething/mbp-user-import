@@ -1,6 +1,6 @@
 <?php
 /**
- * MBP_userCSVfileTools - functionality related to the Message Broker
+ * MBP_UserImport_NorthstarTools - functionality related to the Message Broker
  * producer mbp-user-import to coordinate gathering of user data from
  * Northstar (DoSomething User API).
  */
@@ -12,29 +12,36 @@ use DoSomething\StatHat\Client as StatHat;
 use \Exception;
 
 /**
- *
+ * A collection of functionality and settings related to user imports from Northstar.
  */
 class MBP_UserImport_NorthstarTools
 {
 
-  /**
-   * General settings not related to a specific service.
-   *
-   * @var array
-   */
+    /**
+     * Configuration settings loaded from singleton instances.
+     *
+     * @var array
+     */
+    private $mbConfig;
+
+    /**
+     * General settings not related to a specific service.
+     *
+     * @var array
+     */
     private $settings;
 
-  /**
-   * Logging script activity.
-   *
-   * @var object
-   */
+    /**
+     * Logging script activity.
+     *
+     * @var object
+     */
     private $statHat;
 
-  /**
-   * Constructor for MBP_NorthstarTools. Load configuration settings to be used
-   * throughout the class.
-   */
+    /**
+     * Constructor for MBP_UserImport_NorthstarTools. Load configuration settings to be used
+     * throughout the class.
+     */
     public function __construct()
     {
 
@@ -44,17 +51,17 @@ class MBP_UserImport_NorthstarTools
         $this->statHat = $this->mbConfig->getProperty('statHat');
     }
 
-  /*
-   * Gather user data from Northstar of users created from mobile application. This is a short term solution to
-   * ensure mobile signup users are being added to MailChimp. Longterms a Quicksilver-API endpoint will be available
-   * to call to trigger the MailChimp signup functionality mbc- ???
-   *
-   * @return array
-   */
+    /*
+     * Gather user data from Northstar of users created from mobile application. This is a short term solution to
+     * ensure mobile signup users are being added to MailChimp. Longterms a Quicksilver-API endpoint will be available
+     * to call to trigger the MailChimp signup functionality mbc- ???
+     *
+     * @return array
+     */
     public function gatherMobileUsers()
     {
 
-        echo '------- MBP_NorthstarTools->MobileUsers() START - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
+        echo '------- MBP_UserImport_NorthstarTools->MobileUsers() START - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
         $mobileSignups[] = [
             'mobile' => '',
