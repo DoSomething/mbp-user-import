@@ -6,8 +6,8 @@
  * the file in data directory to be detercted by import script for processing.
  */
 
-use DoSomething\MBP_UserImport\MBP_UserCSVfileTools;
-use DoSomething\MBP_UserImport\MBP_NorthstarTools;
+use DoSomething\MBP_UserImport\MBP_UserImport_CSVfileTools;
+use DoSomething\MBP_UserImport\MBP_UserImport_NorthstarTools;
 use DoSomething\MBP_UserImport\MBP_UserImport_Producer;
 
 date_default_timezone_set('America/New_York');
@@ -42,16 +42,16 @@ $source = validateSource($source);
 if (!empty($source)) {
     switch ($source) {
         case 'Northstar':
-            $mbpNorthstarTools = new MBP_NorthstarTools();
-            $mobileSignups = $mbpNorthstarTools->gatherMobileUsers();
+            $mbpUserImportNorthstarTools = new MBP_UserImport_NorthstarTools();
+            $mobileSignups = $mbpUserImportNorthstarTools->gatherMobileUsers();
             $mbpUserImportProducer = new MBP_UserImport_Producer();
             $status = $mbpUserImportProducer->produceNorthstarMobileUsers($mobileSignups);
             break;
 
         case 'Niche':
         case 'AfterSchool':
-            $mbpUserCSVfileTools = new MBP_UserCSVfileTools();
-            $status = $mbpUserCSVfileTools->gatherIMAP($source);
+            $mbpUserImportCSVfileTools = new MBP_UserImport_CSVfileTools();
+            $status = $mbpUserImportCSVfileTools->gatherIMAP($source);
             break;
 
         default:
