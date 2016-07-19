@@ -61,6 +61,24 @@ try {
 echo '------- mbp-user-import END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
 /**
+ * Gather parameters set when application starts.
+ *
+ * @param string $source
+ *   The name of the source of user data.
+ *
+ * @return
+ *   $source string: one of the supported source (co-registration) values.
+ */
+function validateSource($source) {
+
+    $allowedSources = unserialize(ALLOWED_SOURCES);
+    if (!in_array($source, $allowedSources)) {
+        die('Invalid source value. Acceptable values: ' . print_r($allowedSources, true));
+    }
+    return $source;
+}
+
+/**
  * Test if environment setting is a supported value.
  *
  * @param string $setting Requested enviroment setting.
@@ -84,14 +102,14 @@ function allowedEnviroment($setting)
 }
 
 /**
- * Gather configuration settings for current application enviroment.
+ * Gather configuration settings for current application environment.
  *
  * @return boolean
  */
 function loadConfig() {
 
     // Check that environment config file exists
-    if (!file_exists (enviroment.php)) {
+    if (!file_exists (environment.php)) {
         return false;
     }
     include('./environment.php');
