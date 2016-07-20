@@ -43,7 +43,8 @@ if (isset($_GET['source'])) {
 $source = validateSource($source);
 if (!empty($source)) {
     switch ($source) {
-        case 'Northstar':
+        case 'mobileapp_ios':
+        case 'mobileapp_android':
             $mbpUserImportNorthstarTools = new MBP_UserImport_NorthstarTools();
             $mobileSignups = $mbpUserImportNorthstarTools->gatherMobileUsers();
             $mbpUserImportProducer = new MBP_UserImport_Producer();
