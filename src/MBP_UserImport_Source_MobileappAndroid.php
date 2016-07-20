@@ -27,20 +27,12 @@ class MBP_UserImport_Source_MobileappAndroid extends MBP_UserImport_BaseSource
      *
      */
     const USER_COUNTRY = 'US';
-    
+
     /**
-     * Supported values from returned Northstar API data.
+     *
      */
-    protected function setKeys()
-    {
-        
-        $keys = [
-            '',
-        ];
-        
-        return $keys;
-    }
-  
+    const MAILCHIMP_LIST_ID = 'f2fab1dfd4';
+
     /**
      * Logic to determine if data from Mobile Application - IOS user data can be
      * processed.
@@ -51,8 +43,12 @@ class MBP_UserImport_Source_MobileappAndroid extends MBP_UserImport_BaseSource
     public function canProcess($data)
     {
 
-        if (!(preg_match($regex, $data['email']))) {
-            echo '** canProcess(): Invalid email address: ' .  $data['email'], PHP_EOL;
+        if (empty($data['email'])) {
+            echo '- canProcess(), email not set.', PHP_EOL;
+            return false;
+        }
+        if (filter_var($data['email'], FILTER_VALIDATE_EMAIL) === false) {
+            echo '- canProcess(), failed FILTER_VALIDATE_EMAIL: ' . $data['email'], PHP_EOL;
             return false;
         }
 
@@ -71,22 +67,44 @@ class MBP_UserImport_Source_MobileappAndroid extends MBP_UserImport_BaseSource
     {
 
         $message = [];
-        $message['email'] = $data['email'];
-        $message['mobile'] = $data['mobile'];
+
+        if (filter_var($data['email'], FILTER_VALIDATE_EMAIL) !== false) {
+            $message['email'] = filter_var($data['email'], FILTER_VALIDATE_EMAIL);
+        } else {
+            $message['email'] = $data['email'];
+        }
+        // Default to general Do Something Memebers list. Logic in mbc-registration-email will rest list ID
+        // if user is deemed international.
+        $message['mailchimp_list_id'] = self::MAILCHIMP_LIST_ID;
+
+        // Validate phone number based on the North American Numbering Plan
+        // https://en.wikipedia.org/wiki/North_American_Numbering_Plan
+        $regex = "/^(\d[\s-]?)?[\(\[\s-]{0,2}?\d{3}[\)\]\s-]{0,2}?\d{3}[\s-]?\d{4}$/i";
+        if (preg_match($regex, $message['mobile'])) {
+            $message['mobile'] = $data['mobile'];
+        }
+
         $message['first_name'] = ucwords($data['first_name']);
         $message['subscribed'] = 1;
-        $message['activity_timestamp'] = $data['activity_timestamp'];
-        $message['application_id'] = 'Mobile Application - Android';
+        $message['activity_timestamp'] = time();
+        $message['application_id'] = 'Mobile Application - IOS';
         $message['source'] = 'user_import' . $data['source'];
 
-        // All After School users are assumed to be from the United States.
-        $message['user_country'] = self::USER_COUNTRY;
-        $message['user_language'] = self::USER_LANGUAGE;
+        if (!empty($message['user_country'])) {
+            $message['user_country'] = $data['user_country'];
+        } else {
+            $message['user_country'] = self::USER_COUNTRY;
+        }
+        if (!empty($message['user_language'])) {
+            $message['user_language'] = $data['user_language'];
+        } else {
+            $message['user_language'] = self::USER_LANGUAGE;
+        }
 
         // Wipe data values with formatted $message values
         $data = $message;
     }
-    
+
     /**
      * Publish message to userImport queue.
      *
@@ -97,7 +115,7 @@ class MBP_UserImport_Source_MobileappAndroid extends MBP_UserImport_BaseSource
      */
     public function process($message)
     {
-        
+
         $payload = json_encode($message);
         $this->messageBroker->publish($payload, 'userImport');
     }
