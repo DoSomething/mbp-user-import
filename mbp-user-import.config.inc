@@ -42,7 +42,6 @@ $mbConfig->setProperty('mbRabbitMQManagementAPI', new MB_RabbitMQManagementAPI([
 
 $mbRabbitConfig = $mbConfig->constructRabbitConfig('directUserImport', ['userImportQueue']);
 $rabbitCredentials = $mbConfig->getProperty('rabbit_credentials');
-// Create untility objects for access anywhere within the application as a single instance
 $mbConfig->setProperty('messageBroker', new MessageBroker($rabbitCredentials, $mbRabbitConfig));
 
 $mbRabbitConfig = $mbConfig->constructRabbitConfig('directLoggingGateway', ['loggingGatewayQueue']);
