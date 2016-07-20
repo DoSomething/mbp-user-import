@@ -44,6 +44,13 @@ class MBP_UserImport_NorthstarTools
     private $northstarAPIConfig;
 
     /**
+     * Configuration settings for connecting to Northstar API.
+     *
+     * @var array
+     */
+    private $mbToolboxcURL;
+
+    /**
      * Logging script activity.
      *
      * @var object
@@ -60,6 +67,7 @@ class MBP_UserImport_NorthstarTools
         $this->mbConfig = MB_Configuration::getInstance();
 
         $this->settings = $this->mbConfig->getProperty('generalSettings');
+        $this->mbToolboxcURL = $this->mbConfig->getProperty('mbToolboxCURL');
         $this->northstarAPIConfig = $this->mbConfig->getProperty('northstar_config');
         $this->statHat = $this->mbConfig->getProperty('statHat');
     }
@@ -79,25 +87,29 @@ class MBP_UserImport_NorthstarTools
         $page = 0;
         $mobileSignups = [];
         $targetSources = [
-            'mobileapp-iphone',
-            'mobileapp-android'
+            'mobileapp_ios',
+            'mobileapp_android'
         ];
 
         // Gather all mobile user data which based on all source types
         foreach ($targetSources as $source) {
 
             do {
-
                 $page++;
                 $results = $this->getNorthstarData($source, $page);
-                $totalPages = $results->meta->pagination['total_pages'];
+                // $totalPages = $results[0]->meta->pagination->total_pages;
+                $totalPages = 3;
 
-                foreach ($results->data as $result) {
-
+                foreach ($results[0]->data as $result) {
                     $mobileSignups[] = [
-                        'mobile' => '',
+                        'mobile' => $result->mobile,
+                        'email' => $result->email,
+                        'first_name' => $result->first_name,
+                        'birthdate' => $result->birthdate,
+                        'user_language' => $result->language,
+                        'user_country' => $result->country,
+                        'source' => $result->source
                     ];
-
                 }
 
             } while($page < $totalPages);
@@ -122,15 +134,10 @@ class MBP_UserImport_NorthstarTools
                 'missing host setting.');
         }
 
-        $northstarUrl =  $this->northstarAPIConfig['host'];
-        $port = $this->northstarAPIConfig['port'];
-        if ($port > 0 && is_numeric($port)) {
-            $northstarUrl .= ':' . $port;
-        }
-
         // Build query based on endpoint specs:
-        $northstarUrl .= '/' . self::NORTHSTAR_API_VERSION . '/users
-                    ?search[source]=' . $source .
+        $northstarUrl  =  $this->northstarAPIConfig['host'];
+        $northstarUrl .= '/' . self::NORTHSTAR_API_VERSION . '/users' .
+            '?search[source]=' . $source .
             '&limit=100&page=' . $page;
         $results = $this->mbToolboxcURL->curlGET($northstarUrl);
 
