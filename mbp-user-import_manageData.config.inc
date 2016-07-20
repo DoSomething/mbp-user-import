@@ -4,6 +4,7 @@
  */
  
 use DoSomething\MB_Toolbox\MB_Configuration;
+use DoSomething\MB_Toolbox\MB_Toolbox_cURL;
 use Ddeboer\Imap\Server;
 use DoSomething\StatHat\Client as StatHat;
 
@@ -14,11 +15,13 @@ require_once CONFIG_PATH . '/mb-secure-config/' . ENVIRONMENT . '/mb-secure-conf
 define("ALLOWED_SOURCES", serialize([
   'Niche',
   'AfterSchool',
-  'Northstar'
+  'mobileapp_ios',
+  'mobileapp_android'
 ]));
 
 $mbConfig = MB_Configuration::getInstance();
 
+$mbConfig->setProperty('generalSettings', []);
 $mbConfig->setProperty('statHat', new StatHat([
     'ez_key' => getenv("STATHAT_EZKEY"),
     'debug' => getenv("DISABLE_STAT_TRACKING")
@@ -37,3 +40,5 @@ $mbConfig->setProperty('northstar_config', [
     'id' => getenv("NORTHSTAR_API_ID"),
     'key' => getenv('NORTHSTAR_API_KEY'),
 ]);
+
+$mbConfig->setProperty('mbToolboxCURL', new MB_Toolbox_cURL());
