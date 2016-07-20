@@ -16,32 +16,39 @@ use DoSomething\MB_Toolbox\MB_Configuration;
 abstract class MBP_UserImport_BaseSource
 {
 
-  /**
-   * Singleton instance of MB_Configuration application settings and service objects
-   *
-   * @var object
-   */
+    /**
+     * Singleton instance of MB_Configuration application settings and service objects
+     *
+     * @var object
+     */
     protected $mbConfig;
 
-  /**
-   * StatHat object for logging of activity
-   *
-   * @var object
-   */
+    /**
+     * StatHat object for logging of activity
+     *
+     * @var object
+     */
     protected $statHat;
+
+    /**
+     * StatHat object for logging of activity
+     *
+     * @var object
+     */
+    protected $messageBroker;
   
-  /**
-   * A list of supported keys in the CSV file provided by the source.
-   *
-   * @var array
-   */
+    /**
+     * A list of supported keys in the CSV file provided by the source.
+     *
+     * @var array
+     */
     protected $keys;
   
-  /**
-   * The number of user rows from CSV file processed.
-   *
-   * @var integer
-   */
+    /**
+     * The number of user rows from CSV file processed.
+     *
+     * @var integer
+     */
     protected $imported = 0;
   
   /**
@@ -51,40 +58,41 @@ abstract class MBP_UserImport_BaseSource
    */
     protected $skipped = 0;
 
-  /**
-   * Constructor for MBC_BaseConsumer - all consumer applications should extend this base class.
-   *
-   * @param array $message
-   *   The message to process by the service from the connected queue.
-   */
+    /**
+     * Constructor for MBC_BaseConsumer - all consumer applications should extend this base class.
+     *
+     * @param array $message
+     *   The message to process by the service from the connected queue.
+     */
     public function __construct()
     {
 
         $this->mbConfig = MB_Configuration::getInstance();
+        $this->messageBroker = $this->mbConfig->getProperty('messageBroker');
         $this->statHat = $this->mbConfig->getProperty('statHat');
         $this->keys = $this->setKeys();
     }
 
-  /**
-   * Supported key / columns in CSV file from source.
-   */
+    /**
+     * Supported key / columns in CSV file from source.
+     */
     abstract protected function setKeys();
-  
-  /**
-   * Logic to determine if data from row in CSV file can be processed.
-   *
-   * @param array $data
-   *   Values to test.
-   */
+
+    /**
+     * Logic to determine if data from row in CSV file can be processed.
+     *
+     * @param array $data
+     *   Values to test.
+     */
     abstract public function canProcess($data);
 
-  /**
-   * Assign columns specific to the source to common columns expected by the consumer.
-   */
+    /**
+     * Assign columns specific to the source to common columns expected by the consumer.
+     */
     abstract public function setter(&$data);
 
-  /**
-   * Logic to process CSV file based on column / line endings.
-   */
+    /**
+     * Logic to process CSV file based on column / line endings.
+     */
     abstract public function process($data);
 }
