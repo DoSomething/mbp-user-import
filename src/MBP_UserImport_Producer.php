@@ -32,6 +32,13 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
    */
     private $skipped;
 
+    /**
+     * ...
+     *
+     * @var object
+     */
+    private $source;
+
   /**
    * Message Broker Logging object that details the connection to RabbitMQ for logging messages.
    *
@@ -153,17 +160,40 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
      */
     public function produceNorthstarMobileUsers($mobileSignups)
     {
+        $imported = 0;
+        $skipped = 0;
 
-        $this->imported = '';
-        $this->skipped = '';
+        foreach($mobileSignups as $mobileappSignup) {
 
-        foreach($mobileSignups as $mobileSignup) {
+            // Create instance of source class to use values specific to the source type.
+            $allowedSources = unserialize(ALLOWED_SOURCES);
+            if (in_array($mobileappSignup['source'], $allowedSources)) {
+                $sourceNames = explode('_', $mobileappSignup['source']);
+                foreach($sourceNames as $name) {
+                    $classWords[] = ucfirst($name);
+                }
+                $source = implode('', $classWords);
+                $sourceClassName = __NAMESPACE__ . '\MBP_UserImport_Source_' . $source;
+                $this->source = new $sourceClassName();
+            } else {
+                throw new Exception('Invalid source value.');
+            }
 
+            // Check for required fields based on the source
+            if ($this->source->canProcess($mobileappSignup)) {
+                $this->source->setter($mobileappSignup);
+                $payload = parent::generatePayload($mobileappSignup);
+                $this->source->process($payload);
+
+                $imported++;
+            } elseif ($signupCount < count($signups)) {
+                $skipped++;
+            }
         }
 
+        echo '- Imported: ' . $imported, PHP_EOL;
+        echo '- Skipped: ' . $skipped, PHP_EOL;
         echo '------- MBP_UserImport_Producer->produceNorthstarMobileUsers() END - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
-
-        return $status;
     }
 
   /*
