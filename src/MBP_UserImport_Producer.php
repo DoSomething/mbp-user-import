@@ -169,6 +169,7 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
             $allowedSources = unserialize(ALLOWED_SOURCES);
             if (in_array($mobileappSignup['source'], $allowedSources)) {
                 $sourceNames = explode('_', $mobileappSignup['source']);
+                $classWords = [];
                 foreach($sourceNames as $name) {
                     $classWords[] = ucfirst($name);
                 }
@@ -186,7 +187,7 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
                 $this->source->process($payload);
 
                 $imported++;
-            } elseif ($signupCount < count($signups)) {
+            } else {
                 $skipped++;
             }
         }
