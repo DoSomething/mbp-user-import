@@ -77,25 +77,37 @@ class MBP_UserImport_Source_MobileappAndroid extends MBP_UserImport_BaseSource
         // if user is deemed international.
         $message['mailchimp_list_id'] = self::MAILCHIMP_LIST_ID;
 
-        // Validate phone number based on the North American Numbering Plan
-        // https://en.wikipedia.org/wiki/North_American_Numbering_Plan
-        $regex = "/^(\d[\s-]?)?[\(\[\s-]{0,2}?\d{3}[\)\]\s-]{0,2}?\d{3}[\s-]?\d{4}$/i";
-        if (preg_match($regex, $message['mobile'])) {
-            $message['mobile'] = $data['mobile'];
-        }
-
         $message['first_name'] = ucwords($data['first_name']);
         $message['subscribed'] = 1;
+        $message['activity'] = 'user_import';
         $message['activity_timestamp'] = time();
-        $message['application_id'] = 'Mobile Application - IOS';
-        $message['source'] = 'user_import' . $data['source'];
+        $message['application_id'] = 'MA-A';
+        $message['transactions'] = 0;
+        $message['source'] = $data['source'];
 
-        if (!empty($message['user_country'])) {
+        if (isset($message['mobile'])) {
+            // Validate phone number based on the North American Numbering Plan
+            // https://en.wikipedia.org/wiki/North_American_Numbering_Plan
+            $regex = "/^(\d[\s-]?)?[\(\[\s-]{0,2}?\d{3}[\)\]\s-]{0,2}?\d{3}[\s-]?\d{4}$/i";
+            if (preg_match ($regex, $message['mobile'])) {
+                $message['mobile'] = $data['mobile'];
+            }
+        }
+
+        $message['id'] = $data['northstar_id'];
+        if (isset($data['drupal_id'])) {
+            $message['drupal_uid'] = $data['drupal_id'];
+        }
+        if (isset($data['birthdate'])) {
+            $message['birthdate'] = $data['birthdate'];
+        }
+
+        if (!empty($data['user_country'])) {
             $message['user_country'] = $data['user_country'];
         } else {
             $message['user_country'] = self::USER_COUNTRY;
         }
-        if (!empty($message['user_language'])) {
+        if (!empty($data['user_language'])) {
             $message['user_language'] = $data['user_language'];
         } else {
             $message['user_language'] = self::USER_LANGUAGE;
@@ -118,5 +130,13 @@ class MBP_UserImport_Source_MobileappAndroid extends MBP_UserImport_BaseSource
 
         $payload = json_encode($message);
         $this->messageBroker->publish($payload, 'userImport');
+    }
+
+    /**
+     * NOT USED
+     * Supported key / columns in CSV file from source.
+     */
+    public function setKeys()
+    {
     }
 }
