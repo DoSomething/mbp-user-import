@@ -104,6 +104,8 @@ class MBP_UserImport_NorthstarTools
                     $mobileSignups[] = [
                         'mobile' => $result->mobile,
                         'email' => $result->email,
+                        'northstar_id' => $result->id,
+                        'drupal_id' => $result->drupal_id,
                         'first_name' => $result->first_name,
                         'birthdate' => $result->birthdate,
                         'user_language' => $result->language,
