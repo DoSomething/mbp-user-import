@@ -160,6 +160,9 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
      */
     public function produceNorthstarMobileUsers($mobileSignups)
     {
+        echo '------- MBP_UserImport_Producer->produceNorthstarMobileUsers() - START: ' . date('j D M Y G:i:s T') .
+            ' -------', PHP_EOL;
+
         $imported = 0;
         $skipped = 0;
 
@@ -168,12 +171,7 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
             // Create instance of source class to use values specific to the source type.
             $allowedSources = unserialize(ALLOWED_SOURCES);
             if (in_array($mobileappSignup['source'], $allowedSources)) {
-                $sourceNames = explode('_', $mobileappSignup['source']);
-                $classWords = [];
-                foreach($sourceNames as $name) {
-                    $classWords[] = ucfirst($name);
-                }
-                $source = implode('', $classWords);
+                $source = $this->normalizeSource($mobileappSignup['source']);
                 $sourceClassName = __NAMESPACE__ . '\MBP_UserImport_Source_' . $source;
                 $this->source = new $sourceClassName();
             } else {
@@ -195,6 +193,25 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
         echo '- Imported: ' . $imported, PHP_EOL;
         echo '- Skipped: ' . $skipped, PHP_EOL;
         echo '------- MBP_UserImport_Producer->produceNorthstarMobileUsers() END - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
+    }
+
+    /**
+     * Process source value to normalized value that can be used as part of class name.
+     *
+     * @param string $source Current source value.
+     *
+     * @return string
+     */
+    private function normalizeSource($source) {
+
+        $sourceNames = explode('_', $source);
+        $classWords = [];
+        foreach($sourceNames as $name) {
+            $classWords[] = ucfirst($name);
+        }
+        $source = implode('', $classWords);
+
+        return $source;
     }
 
   /*
