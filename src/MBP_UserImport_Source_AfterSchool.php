@@ -158,27 +158,29 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
    * @return integer $mobileCommonsOptinID
    *   The Mobile Commons optin ID to send the user (phone number) to.
    */
-  private function campaignIDtoOptInID($afterSchoolCampaignID) {
+  private function campaignIDtoOptInID($afterSchoolCampaignID)
+  {
 
-    switch ($afterSchoolCampaignID) {
+      switch ($afterSchoolCampaignID) {
 
-      // Less Stress Text
-      case 113728:
-        $mobileCommonsOptinID = 203783;
-        break;
+          // Less Stress Text
+          case 113728:
+              $mobileCommonsOptinID = 203783;
+              break;
 
-      // Planet Zombie - To Be Determined
-      case 120470:
-        $mobileCommonsOptinID = 205829;
-        break;
+          // Planet Zombie - To Be Determined
+          case 120470:
+              $mobileCommonsOptinID = 205829;
+              break;
 
-      // Don't Drive Intexticated (DDI)
-      case 162474:
-        $mobileCommonsOptinID = 209193;
-        break;
+          // Don't Drive Intexticated (DDI)
+          case 162474:
+              $mobileCommonsOptinID = 209193;
+              break;
 
-      default:
-        throw new Exception('Undefined After School Campaign ID: ' . $afterSchoolCampaignID);
-        break;
-    }
+          default:
+              throw new Exception('Undefined After School Campaign ID: ' . $afterSchoolCampaignID);
+              break;
+      }
+  }
 }
