@@ -85,11 +85,11 @@ class MBP_UserImport_Source_MobileappAndroid extends MBP_UserImport_BaseSource
         $message['transactions'] = 0;
         $message['source'] = $data['source'];
 
-        if (isset($message['mobile'])) {
+        if (isset($data['mobile'])) {
             // Validate phone number based on the North American Numbering Plan
             // https://en.wikipedia.org/wiki/North_American_Numbering_Plan
             $regex = "/^(\d[\s-]?)?[\(\[\s-]{0,2}?\d{3}[\)\]\s-]{0,2}?\d{3}[\s-]?\d{4}$/i";
-            if (preg_match ($regex, $message['mobile'])) {
+            if (preg_match ($regex, $data['mobile'])) {
                 $message['mobile'] = $data['mobile'];
             }
         }
