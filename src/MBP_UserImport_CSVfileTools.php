@@ -16,7 +16,7 @@ use DoSomething\StatHat\Client as StatHat;
 /**
  *
  */
-class MBP_IserImport_CSVfileTools
+class MBP_UserImport_CSVfileTools
 {
 
   /**
