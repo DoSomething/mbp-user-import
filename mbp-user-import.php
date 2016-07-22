@@ -37,15 +37,15 @@ try {
     $targetFile = 'nextFile';
     if (isset($_GET['targetFile'])) {
         $targetFile = $_GET['targetFile'];
-    } elseif (isset($argv[1])) {
-        $targetFile = $argv[1];
+    } elseif (isset($argv[2])) {
+        $targetFile = $argv[2];
     }
 
     $source = null;
     if (isset($_GET['source'])) {
         $source = $_GET['source'];
-    } elseif (isset($argv[2])) {
-        $source = $argv[2];
+    } elseif (isset($argv[3])) {
+        $source = $argv[3];
     }
 
     $source = validateSource($source);
