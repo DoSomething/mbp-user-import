@@ -23,35 +23,43 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
    *
    * @var integer
    */
-  private $imported;
+    private $imported;
 
   /**
    * The number of sets of user data that resulted in users being imported.
    *
    * @var integer
    */
-  private $skipped;
+    private $skipped;
+
+    /**
+     * ...
+     *
+     * @var object
+     */
+    private $source;
 
   /**
    * Message Broker Logging object that details the connection to RabbitMQ for logging messages.
    *
    * @var object
    */
-  private $messageBrokerLogging;
+    private $messageBrokerLogging;
 
   /**
    * Constructor for MBC_UserImport. Load settings to be used by instance of class. Settings
    * based on Singleton configuration values defined in .config.in file.
    */
-  public function __construct() {
+    public function __construct()
+    {
 
-    parent:: __construct();
-    $this->mbConfig = MB_Configuration::getInstance();
-    $this->messageBrokerLogging = $this->mbConfig->getProperty('messageBrokerLogging');
+        parent:: __construct();
+        $this->mbConfig = MB_Configuration::getInstance();
+        $this->messageBrokerLogging = $this->mbConfig->getProperty('messageBrokerLogging');
     
-    $this->imported = 0;
-    $this->skipped = 0;
-  }
+        $this->imported = 0;
+        $this->skipped = 0;
+    }
 
   /*
    * Produce entries in the MB_USER_IMPORT_QUEUE
@@ -61,91 +69,150 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
    * @param string $source
    *   The source of the import data
    */
-  public function produceCSVImport($targetCSVFile, $source = NULL) {
+    public function produceCSVImport($targetCSVFile, $source = null)
+    {
 
-    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
+        echo '------- mbp-user-import->produceCSVImport() ' . $source . ' START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
     
-    // Create instance of source class to use values specific to the source type.
-    $allowedSources = unserialize(ALLOWED_SOURCES);
-    if (in_array($source, $allowedSources)) {
-      $sourceClassName = __NAMESPACE__ . '\MBP_UserImport_Source_' . $source;
-      $this->source = new $sourceClassName();
-    }
-    else {
-      throw new Exception('Invalid source value.');
-    }
+        // Create instance of source class to use values specific to the source type.
+        $allowedSources = unserialize(ALLOWED_SOURCES);
+        if (in_array($source, $allowedSources)) {
+            $sourceClassName = __NAMESPACE__ . '\MBP_UserImport_Source_' . $source;
+            $this->source = new $sourceClassName();
+        } else {
+            throw new Exception('Invalid source value.');
+        }
 
-    if ($targetCSVFile == 'nextFile') {
-      $targetCSVFile = $this->findNextTargetFile($source);
-      $targetFilePaths = explode('/', $targetCSVFile);
-      $targetCSVFileName = $targetFilePaths[count($targetFilePaths) - 1];
-      if ($targetCSVFile === false) {
-        throw new Exception('No additional files to be processed.');
-      }
-    }
-    else {
-      $targetCSVFileName = $targetCSVFile;
-      $targetCSVFile = __DIR__ . '/../data/' . $source . '/' . $targetCSVFile;
-      if (!(file_exists($targetCSVFile))) {
-        throw new Exception($targetCSVFileName . ' not found.');
-      }
-    }
+        if ($targetCSVFile == 'nextFile') {
+            $targetCSVFile = $this->findNextTargetFile($source);
+            $targetFilePaths = explode('/', $targetCSVFile);
+            $targetCSVFileName = $targetFilePaths[count($targetFilePaths) - 1];
+            if ($targetCSVFile === false) {
+                throw new Exception('No additional files to be processed.');
+            }
+        } else {
+            $targetCSVFileName = $targetCSVFile;
+            $targetCSVFile = __DIR__ . '/../data/' . $source . '/' . $targetCSVFile;
+            if (!(file_exists($targetCSVFile))) {
+                throw new Exception($targetCSVFileName . ' not found.');
+            }
+        }
 
-    // Lock file to prevent other processes from using the same file
-    $targetCSVFileLocked = $targetCSVFile . '.locked';
-    $renamed = rename($targetCSVFile, $targetCSVFileLocked);
-    if (!$renamed) {
-      throw new Exception('Failed to lock: ' . $targetCSVFile);
-    }
+        // Lock file to prevent other processes from using the same file
+        $targetCSVFileLocked = $targetCSVFile . '.locked';
+        $renamed = rename($targetCSVFile, $targetCSVFileLocked);
+        if (!$renamed) {
+            throw new Exception('Failed to lock: ' . $targetCSVFile);
+        }
 
-    $signups = file($targetCSVFileLocked);
+        $signups = file($targetCSVFileLocked);
 
-    // Support files missing line breaks "\n" (Windoz and old OSX). Explode CSV data by line breaks to
-    // define each user data row.
-    if (count($signups) == 1 && substr_count($signups[0], "\r") > 0) {
-      $signups = explode("\r", $signups[0]);
-    }
+        // Support files missing line breaks "\n" (Windoz and old OSX). Explode CSV data by line breaks to
+        // define each user data row.
+        if (count($signups) == 1 && substr_count($signups[0], "\r") > 0) {
+            $signups = explode("\r", $signups[0]);
+        }
 
-    // Process file contents by row
-    $totalSignups = count($signups) - 1;
-    $this->statHat->ezCount('mbp-user-import:  MBP_UserImport_Producer: batchSize', $totalSignups);
-    for ($signupCount = 1; $signupCount <= $totalSignups; $signupCount++) {
+        // Process file contents by row
+        $totalSignups = count($signups) - 1;
+        $this->statHat->ezCount('mbp-user-import:  MBP_UserImport_Producer: batchSize', $totalSignups);
+        for ($signupCount = 1; $signupCount <= $totalSignups; $signupCount++) {
+            $signup = $signups[$signupCount];
+            $data = $this->source->process($signup);
 
-      $signup = $signups[$signupCount];
-      $data = $this->source->process($signup);
+            $data['subscribed'] = 1;
+            $data['activity'] =  'user_import';
+            $data['activity_timestamp'] =  time();
+            $data['application_id'] = 'MUI'; // Message Broker User Import
+            $data['source'] = $source;
+            $data['source_file'] = $targetCSVFileName;
 
-      $data['subscribed'] = 1;
-      $data['activity'] =  'user_import';
-      $data['activity_timestamp'] =  time();
-      $data['application_id'] = 'MUI'; // Message Broker User Import
-      $data['source'] = $source;
-      $data['source_file'] = $targetCSVFileName;
-
-      // Check for required fields based on the source
-      if ($this->source->canProcess($data)) {
-
-        $this->source->setter($data);
-        $payload = parent::generatePayload($data);
-        $payload = parent::produceMessage($payload, 'userImport');
+            // Check for required fields based on the source
+            if ($this->source->canProcess($data)) {
+                $this->source->setter($data);
+                $payload = parent::generatePayload($data);
+                $payload = parent::produceMessage($payload, 'userImport');
         
-        $this->imported++;
-      }
-      elseif ($signupCount < count($signups)) {
-        $this->skipped++;
-      }
+                $this->imported++;
+            } elseif ($signupCount < count($signups)) {
+                $this->skipped++;
+            }
+        }
+
+        // Log activity
+        $this->logging($source, $targetCSVFileName);
+
+        // Archive file to prevent processing again and to backup to box.com
+        $this->archiveCSV($targetCSVFile);
+
+        $this->statHat->ezCount('mbp-user-import:  MBP_UserImport_Producer: imported', $this->imported);
+        $this->statHat->ezCount('mbp-user-import:  MBP_UserImport_Producer: skipped', $this->skipped);
+        echo $this->imported . ' users imported.' . $this->skipped . ' skipped.', PHP_EOL;
+        echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
     }
 
-    // Log activity
-    $this->logging($source, $targetCSVFileName);
+    /*
+     * Create entries in userImportQueue of mobile user data gathered from Northstar.
+     *
+     * @param array $mobileSignups Details of mobile user signups
+     *
+     * @return boolean
+     */
+    public function produceNorthstarMobileUsers($mobileSignups)
+    {
+        echo '------- MBP_UserImport_Producer->produceNorthstarMobileUsers() - START: ' . date('j D M Y G:i:s T') .
+            ' -------', PHP_EOL;
 
-    // Archive file to prevent processing again and to backup to box.com
-    $this->archiveCSV($targetCSVFile);
+        $imported = 0;
+        $skipped = 0;
 
-    $this->statHat->ezCount('mbp-user-import:  MBP_UserImport_Producer: imported', $this->imported);
-    $this->statHat->ezCount('mbp-user-import:  MBP_UserImport_Producer: skipped', $this->skipped);
-    echo $this->imported . ' users imported.' . $this->skipped . ' skipped.', PHP_EOL;
-    echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
-  }
+        foreach($mobileSignups as $mobileappSignup) {
+
+            // Create instance of source class to use values specific to the source type.
+            $allowedSources = unserialize(ALLOWED_SOURCES);
+            if (in_array($mobileappSignup['source'], $allowedSources)) {
+                $source = $this->normalizeSource($mobileappSignup['source']);
+                $sourceClassName = __NAMESPACE__ . '\MBP_UserImport_Source_' . $source;
+                $this->source = new $sourceClassName();
+            } else {
+                throw new Exception('Invalid source value.');
+            }
+
+            // Check for required fields based on the source
+            if ($this->source->canProcess($mobileappSignup)) {
+                $this->source->setter($mobileappSignup);
+                $payload = parent::generatePayload($mobileappSignup);
+                $this->source->process($payload);
+
+                $imported++;
+            } else {
+                $skipped++;
+            }
+        }
+
+        echo '- Imported: ' . $imported, PHP_EOL;
+        echo '- Skipped: ' . $skipped, PHP_EOL;
+        echo '------- MBP_UserImport_Producer->produceNorthstarMobileUsers() END - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
+    }
+
+    /**
+     * Process source value to normalized value that can be used as part of class name.
+     *
+     * @param string $source Current source value.
+     *
+     * @return string
+     */
+    private function normalizeSource($source) {
+
+        $sourceNames = explode('_', $source);
+        $classWords = [];
+        foreach($sourceNames as $name) {
+            $classWords[] = ucfirst($name);
+        }
+        $source = implode('', $classWords);
+
+        return $source;
+    }
 
   /*
    * Gather next file name to process based on the define source..
@@ -157,24 +224,25 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
    * @return string $targetCSVFile
    *   The name of the file to process.
    */
-  public function findNextTargetFile($source) {
+    public function findNextTargetFile($source)
+    {
 
-    $targetCSVFile = FALSE;
-    $targetCSVDir = __DIR__ . '/../data/' . $source;
-    $files = scandir($targetCSVDir);
+        $targetCSVFile = false;
+        $targetCSVDir = __DIR__ . '/../data/' . $source;
+        $files = scandir($targetCSVDir);
 
-    // Target next file that ends in ".csv"
-    foreach ($files as $file) {
-      $csvPosition = strpos($file, '.csv');
-      $fileLength = strlen($file) - 4;
-      if ($csvPosition == $fileLength) {
-       $targetCSVFile = $targetCSVDir . '/' . $file;
-        break;
-      }
+        // Target next file that ends in ".csv"
+        foreach ($files as $file) {
+            $csvPosition = strpos($file, '.csv');
+            $fileLength = strlen($file) - 4;
+            if ($csvPosition == $fileLength) {
+                $targetCSVFile = $targetCSVDir . '/' . $file;
+                break;
+            }
+        }
+
+        return $targetCSVFile;
     }
-
-    return $targetCSVFile;
-  }
 
   /*
    * Produce entries in the MB_USER_IMPORT_LOGGING_QUEUE to log the total number
@@ -189,18 +257,19 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
    * @param string $targetCSVFile
    *   The file name of the CSV import file.
    */
-  private function logging($source, $targetCSVFile) {
+    private function logging($source, $targetCSVFile)
+    {
 
-    $message = [];
-    $message['log-type'] = 'file-import';
-    $message['log-timestamp'] = time();
-    $message['signup-count'] = $this->imported;
-    $message['skipped'] = $this->skipped;
-    $message['source'] = $source;
-    $message['target-CSV-file'] = $targetCSVFile;
-    $message = json_encode($message);
-    $this->messageBrokerLogging->publish($message, 'loggingGateway');
-  }
+        $message = [];
+        $message['log-type'] = 'file-import';
+        $message['log-timestamp'] = time();
+        $message['signup-count'] = $this->imported;
+        $message['skipped'] = $this->skipped;
+        $message['source'] = $source;
+        $message['target-CSV-file'] = $targetCSVFile;
+        $message = json_encode($message);
+        $this->messageBrokerLogging->publish($message, 'loggingGateway');
+    }
 
   /*
    * Archive import files for long term / archive storage. In doing so rename/move
@@ -210,19 +279,18 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
    * @param string $targetCSVFile
    *   Total number of entries added to the queue.
    */
-  private function archiveCSV($targetCSVFile) {
+    private function archiveCSV($targetCSVFile)
+    {
 
-    $targetCSVFileLocked = $targetCSVFile . '.locked';
-    $processedCSVFile = $targetCSVFile . '.' . time();
-    $archived = rename ($targetCSVFileLocked , $processedCSVFile);
-    if ($archived) {
-      echo '-> mbp-user-import->archiveCSV(): ' . $targetCSVFile . ' archived.', PHP_EOL;
-        // @todo: Move file to box.com
+        $targetCSVFileLocked = $targetCSVFile . '.locked';
+        $processedCSVFile = $targetCSVFile . '.' . time();
+        $archived = rename($targetCSVFileLocked, $processedCSVFile);
+        if ($archived) {
+            echo '-> mbp-user-import->archiveCSV(): ' . $targetCSVFile . ' archived.', PHP_EOL;
+            // @todo: Move file to box.com
+        } else {
+            throw new Exception('Failed to archive mbp-user-import->archiveCSV(): ' . $targetCSVFile . '. The file name needs to change to prevent further re-processing of the file on the next run of the script.');
+        }
+
     }
-    else {
-      throw new Exception('Failed to archive mbp-user-import->archiveCSV(): ' . $targetCSVFile . '. The file name needs to change to prevent further re-processing of the file on the next run of the script.');
-    }
-
-  }
-
 }
