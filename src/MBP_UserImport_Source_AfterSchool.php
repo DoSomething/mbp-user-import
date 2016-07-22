@@ -182,5 +182,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
               throw new Exception('Undefined After School Campaign ID: ' . $afterSchoolCampaignID);
               break;
       }
+
+      return $mobileCommonsOptinID;
   }
 }
