@@ -77,7 +77,10 @@ class MBP_UserImport_Source_MobileappAndroid extends MBP_UserImport_BaseSource
         // if user is deemed international.
         $message['mailchimp_list_id'] = self::MAILCHIMP_LIST_ID;
 
-        $message['first_name'] = ucwords($data['first_name']);
+        // Remove unprintable characters
+        $firstName = preg_replace('/[\x00-\x1F\x7f-\xFF]/', '', $data['first_name']);
+        $message['first_name'] = ucwords($firstName);
+
         $message['subscribed'] = 1;
         $message['activity'] = 'user_import';
         $message['activity_timestamp'] = time();
