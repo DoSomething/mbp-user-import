@@ -40,29 +40,37 @@ if (isset($_GET['source'])) {
     $source = $argv[2];
 }
 
-$source = validateSource($source);
-if (!empty($source)) {
-    switch ($source) {
-        case 'mobileapp_ios':
-        case 'mobileapp_android':
-            $mbpUserImportNorthstarTools = new MBP_UserImport_NorthstarTools();
-            $mobileSignups = $mbpUserImportNorthstarTools->gatherMobileUsers();
-            $mbpUserImportProducer = new MBP_UserImport_Producer();
-            $status = $mbpUserImportProducer->produceNorthstarMobileUsers($mobileSignups);
-            break;
+try {
 
-        case 'Niche':
-        case 'AfterSchool':
-            $mbpUserImportCSVfileTools = new MBP_UserImport_CSVfileTools();
-            $status = $mbpUserImportCSVfileTools->gatherIMAP($source);
-            break;
+    $source = validateSource($source);
+    if (!empty($source)) {
+        switch ($source) {
+            case 'mobileapp_ios':
+            case 'mobileapp_android':
 
-        default:
-            echo 'Source setting passed validation but is not defined: ' . $source, PHP_EOL;
-            break;
+                $mbpUserImportNorthstarTools = new MBP_UserImport_NorthstarTools();
+                $mobileSignups = $mbpUserImportNorthstarTools->gatherMobileUsers($source);
+                $mbpUserImportProducer = new MBP_UserImport_Producer();
+                $status = $mbpUserImportProducer->produceNorthstarMobileUsers($mobileSignups);
+                break;
+
+            case 'Niche':
+            case 'AfterSchool':
+                $mbpUserImportCSVfileTools = new MBP_UserImport_CSVfileTools();
+                $status = $mbpUserImportCSVfileTools->gatherIMAP($source);
+                break;
+
+            default:
+                echo 'Source setting passed validation but is not defined: ' . $source, PHP_EOL;
+                break;
+        }
+    } else {
+        echo '"source" parameter not defined.', PHP_EOL;
     }
-} else {
-    echo '"source" parameter not defined.', PHP_EOL;
+
+}
+catch (Exception $e) {
+    echo $e->getMessage() . ' - ' . date('j D M Y G:i:s T'), PHP_EOL;
 }
 
 echo '------- mbp-user-import_manageData  END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
