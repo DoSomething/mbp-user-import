@@ -77,29 +77,25 @@ class MBP_UserImport_NorthstarTools
      * ensure mobile signup users are being added to MailChimp. Longterms a Quicksilver-API endpoint will be available
      * to call to trigger the MailChimp signup functionality mbc- ???
      *
+     * @param string $targetSource
+     *
      * @return array
      */
-    public function gatherMobileUsers()
+    public function gatherMobileUsers($targetSource)
     {
 
         echo '------- MBP_UserImport_NorthstarTools->MobileUsers() START - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
-        $page = 0;
         $mobileSignups = [];
-        $targetSources = [
-            'mobileapp_ios',
-            'mobileapp_android'
-        ];
+        $page = 0;
+        $totalPages = 0;
 
-        // Gather all mobile user data which based on all source types
-        foreach ($targetSources as $source) {
-
-            do {
-                $page++;
-                $results = $this->getNorthstarData($source, $page);
-                // $totalPages = $results[0]->meta->pagination->total_pages;
-                $totalPages = 3;
-
+        do {
+            $page++;
+            $results = $this->getNorthstarData($targetSource, $page);
+            $totalPages = $results[0]->meta->pagination->total_pages;
+            if ($totalPages > 0) {
+                echo '- gatherMobileUsers() - page: ' . $page . ' of ' . $totalPages . ' for ' . $targetSource, PHP_EOL;
                 foreach ($results[0]->data as $result) {
                     $mobileSignups[] = [
                         'mobile' => $result->mobile,
@@ -113,9 +109,12 @@ class MBP_UserImport_NorthstarTools
                         'source' => $result->source
                     ];
                 }
+            }
 
-            } while($page < $totalPages);
+        } while($page < $totalPages);
 
+        if (count($mobileSignups) === 0) {
+            throw new Exception('Request to gatherMobileUsers(' . $targetSource . ') produce no results');
         }
 
         return $mobileSignups;
