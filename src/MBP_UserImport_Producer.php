@@ -56,7 +56,7 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
         parent:: __construct();
         $this->mbConfig = MB_Configuration::getInstance();
         $this->messageBrokerLogging = $this->mbConfig->getProperty('messageBrokerLogging');
-    
+
         $this->imported = 0;
         $this->skipped = 0;
     }
@@ -73,7 +73,7 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
     {
 
         echo '------- mbp-user-import->produceCSVImport() ' . $source . ' START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
-    
+
         // Create instance of source class to use values specific to the source type.
         $allowedSources = unserialize(ALLOWED_SOURCES);
         if (in_array($source, $allowedSources)) {
@@ -165,28 +165,33 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
 
         $imported = 0;
         $skipped = 0;
+        $allowedSources = unserialize(ALLOWED_SOURCES);
 
         foreach($mobileSignups as $mobileappSignup) {
 
             // Create instance of source class to use values specific to the source type.
-            $allowedSources = unserialize(ALLOWED_SOURCES);
             if (in_array($mobileappSignup['source'], $allowedSources)) {
                 $source = $this->normalizeSource($mobileappSignup['source']);
                 $sourceClassName = __NAMESPACE__ . '\MBP_UserImport_Source_' . $source;
                 $this->source = new $sourceClassName();
             } else {
-                throw new Exception('Invalid source value.');
+                echo 'Invalid source value:. ' . mobileappSignup['source'], PHP_EOL;
+                break;
             }
 
             // Check for required fields based on the source
             if ($this->source->canProcess($mobileappSignup)) {
                 $this->source->setter($mobileappSignup);
                 $payload = parent::generatePayload($mobileappSignup);
+                echo PHP_EOL . '- payload; ' . print_r($payload, true), PHP_EOL.PHP_EOL;
                 $this->source->process($payload);
+                unset($this->source);
 
                 $imported++;
+                echo '- Imported: ' . $imported, PHP_EOL;
             } else {
                 $skipped++;
+                echo '- Skipped: ' . $skipped, PHP_EOL;
             }
         }
 
