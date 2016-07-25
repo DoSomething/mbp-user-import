@@ -7,6 +7,7 @@
 namespace DoSomething\MBP_UserImport;
 
 use DoSomething\MB_Toolbox\MB_Configuration;
+use DoSomething\MBP_UserImport\MBP_UserImport_NorthstarTools;
 use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Toolbox_BaseProducer;
 use \Exception;
@@ -72,7 +73,8 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
     public function produceCSVImport($targetCSVFile, $source = null)
     {
 
-        echo '------- mbp-user-import->produceCSVImport() ' . $source . ' START: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
+        echo '------- mbp-user-import->produceCSVImport() ' . $source . ' START: ' . date('j D M Y G:i:s T') .
+            ' -------', PHP_EOL;
 
         // Create instance of source class to use values specific to the source type.
         $allowedSources = unserialize(ALLOWED_SOURCES);
@@ -132,7 +134,7 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
                 $this->source->setter($data);
                 $payload = parent::generatePayload($data);
                 $payload = parent::produceMessage($payload, 'userImport');
-        
+
                 $this->imported++;
             } elseif ($signupCount < count($signups)) {
                 $this->skipped++;
@@ -148,56 +150,89 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
         $this->statHat->ezCount('mbp-user-import:  MBP_UserImport_Producer: imported', $this->imported);
         $this->statHat->ezCount('mbp-user-import:  MBP_UserImport_Producer: skipped', $this->skipped);
         echo $this->imported . ' users imported.' . $this->skipped . ' skipped.', PHP_EOL;
-        echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
+        echo '------- mbp-user-import->produceCSVImport() ' . $source . ' END: ' . date('j D M Y G:i:s T') .
+            ' -------', PHP_EOL;
     }
 
     /*
      * Create entries in userImportQueue of mobile user data gathered from Northstar.
      *
-     * @param array $mobileSignups Details of mobile user signups
+     * @param array $source The specific source to gather and process from Northstar.
+     * @param integer $page
      *
      * @return boolean
      */
-    public function produceNorthstarMobileUsers($mobileSignups)
+    public function produceNorthstarMobileUsers($targetSource, $startDate = null, $page = 1)
     {
         echo '------- MBP_UserImport_Producer->produceNorthstarMobileUsers() - START: ' . date('j D M Y G:i:s T') .
             ' -------', PHP_EOL;
 
         $imported = 0;
         $skipped = 0;
-        $allowedSources = unserialize(ALLOWED_SOURCES);
-
-        foreach($mobileSignups as $mobileappSignup) {
-
-            // Create instance of source class to use values specific to the source type.
-            if (in_array($mobileappSignup['source'], $allowedSources)) {
-                $source = $this->normalizeSource($mobileappSignup['source']);
-                $sourceClassName = __NAMESPACE__ . '\MBP_UserImport_Source_' . $source;
-                $this->source = new $sourceClassName();
-            } else {
-                echo 'Invalid source value:. ' . mobileappSignup['source'], PHP_EOL;
-                break;
-            }
-
-            // Check for required fields based on the source
-            if ($this->source->canProcess($mobileappSignup)) {
-                $this->source->setter($mobileappSignup);
-                $payload = parent::generatePayload($mobileappSignup);
-                echo PHP_EOL . '- payload; ' . print_r($payload, true), PHP_EOL.PHP_EOL;
-                $this->source->process($payload);
-                unset($this->source);
-
-                $imported++;
-                echo '- Imported: ' . $imported, PHP_EOL;
-            } else {
-                $skipped++;
-                echo '- Skipped: ' . $skipped, PHP_EOL;
-            }
+        if ($startDate == null) {
+            $startDate = date('c', mktime(0, 0, 0, date("n"), date("j") - 1, date("Y")));
         }
+
+        $allowedSources = unserialize(ALLOWED_SOURCES);
+        $mbpUserImportNorthstarTools = new MBP_UserImport_NorthstarTools();
+
+        do {
+            list($results, $totalPages) = $mbpUserImportNorthstarTools->gatherMobileUsers(
+                $targetSource,
+                $startDate,
+                $page
+            );
+
+            // Skip data processing if nothing to process. Typically data is out of startDate range.
+            if (count($results) > 0) {
+                foreach ($results as $result) {
+                    $mobileSignup = [
+                        'mobile' => $result->mobile,
+                        'email' => $result->email,
+                        'northstar_id' => $result->id,
+                        'drupal_id' => $result->drupal_id,
+                        'first_name' => $result->first_name,
+                        'birthdate' => $result->birthdate,
+                        'user_language' => $result->language,
+                        'user_country' => $result->country,
+                        'source' => $result->source,
+                        'created_at' => $result->created_at
+                    ];
+
+                    // Create instance of source class to use values specific to the source type.
+                    if (in_array($mobileSignup['source'], $allowedSources)) {
+                        $source = $this->normalizeSource($mobileSignup['source']);
+                        $sourceClassName = __NAMESPACE__ . '\MBP_UserImport_Source_' . $source;
+                        $this->source = new $sourceClassName();
+                    } else {
+                        echo 'Invalid source value:. ' . $mobileSignup['source'], PHP_EOL;
+                        break;
+                    }
+
+                    // Check for required fields based on the source
+                    if ($this->source->canProcess($mobileSignup)) {
+                        $this->source->setter($mobileSignup);
+                        $payload = parent::generatePayload($mobileSignup);
+                        $this->source->process($payload);
+                        unset($this->source);
+
+                        $imported++;
+                        echo '- ' . $imported . '. of page: ' . $page . ': ' . $mobileSignup['email'] . ' from ' .
+                            $targetSource, PHP_EOL;
+                    } else {
+                        $skipped++;
+                        echo '- Skipped: ' . $skipped, PHP_EOL;
+                    }
+                }
+            }
+            $page++;
+
+        } while ($page <= $totalPages);
 
         echo '- Imported: ' . $imported, PHP_EOL;
         echo '- Skipped: ' . $skipped, PHP_EOL;
-        echo '------- MBP_UserImport_Producer->produceNorthstarMobileUsers() END - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
+        echo '------- MBP_UserImport_Producer->produceNorthstarMobileUsers() END - ' . date('j D M Y G:i:s T') .
+            ' -------', PHP_EOL;
     }
 
     /**

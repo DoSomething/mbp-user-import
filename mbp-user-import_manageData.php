@@ -7,7 +7,6 @@
  */
 
 use DoSomething\MBP_UserImport\MBP_UserImport_CSVfileTools;
-use DoSomething\MBP_UserImport\MBP_UserImport_NorthstarTools;
 use DoSomething\MBP_UserImport\MBP_UserImport_Producer;
 
 date_default_timezone_set('America/New_York');
@@ -47,11 +46,24 @@ try {
         switch ($source) {
             case 'mobileapp_ios':
             case 'mobileapp_android':
+                $page = 1;
+                if (isset($_GET['page'])) {
+                    $page = $_GET['page'];
+                } elseif (isset($argv[3])) {
+                    $page = $argv[3];
+                }
 
-                $mbpUserImportNorthstarTools = new MBP_UserImport_NorthstarTools();
-                $mobileSignups = $mbpUserImportNorthstarTools->gatherMobileUsers($source);
+                $startDate = null;
+                if (isset($_GET['startDate'])) {
+                    $startDate = mktime(0, 0, 0, date("n", $_GET['startDate']), date("j", $_GET['startDate']) - 1,
+                        date("Y", $_GET['startDate']));
+                } elseif (isset($argv[4])) {
+                    $startDate = date('c', mktime(0, 0, 0, date("n", $argv[4]), date("j", $argv[4]) - 1,
+                        date("Y", $argv[4])));
+                }
+
                 $mbpUserImportProducer = new MBP_UserImport_Producer();
-                $status = $mbpUserImportProducer->produceNorthstarMobileUsers($mobileSignups);
+                $status = $mbpUserImportProducer->produceNorthstarMobileUsers($source, $startDate, $page);
                 break;
 
             case 'Niche':

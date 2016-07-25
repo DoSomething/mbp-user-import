@@ -78,46 +78,39 @@ class MBP_UserImport_NorthstarTools
      * to call to trigger the MailChimp signup functionality mbc- ???
      *
      * @param string $targetSource
+     * @param integer $page
      *
      * @return array
      */
-    public function gatherMobileUsers($targetSource)
+    public function gatherMobileUsers($targetSource, $startDate, $page)
     {
 
         echo '------- MBP_UserImport_NorthstarTools->MobileUsers() START - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 
-        $mobileSignups = [];
-        $page = 0;
         $totalPages = 0;
+        $mobileUsers = [];
 
-        do {
-            $page++;
-            $results = $this->getNorthstarData($targetSource, $page);
-            $totalPages = $results[0]->meta->pagination->total_pages;
-            if ($totalPages > 0) {
-                echo '- gatherMobileUsers() - page: ' . $page . ' of ' . $totalPages . ' for ' . $targetSource, PHP_EOL;
-                foreach ($results[0]->data as $result) {
-                    $mobileSignups[] = [
-                        'mobile' => $result->mobile,
-                        'email' => $result->email,
-                        'northstar_id' => $result->id,
-                        'drupal_id' => $result->drupal_id,
-                        'first_name' => $result->first_name,
-                        'birthdate' => $result->birthdate,
-                        'user_language' => $result->language,
-                        'user_country' => $result->country,
-                        'source' => $result->source
-                    ];
-                }
-            }
+        $results = $this->getNorthstarData($targetSource, $page);
+        $totalPages = $results[0]->meta->pagination->total_pages;
 
-        } while($page < $totalPages);
-
-        if (count($mobileSignups) === 0) {
+        if (count($results[0]->data) === 0) {
             throw new Exception('Request to gatherMobileUsers(' . $targetSource . ') produce no results');
         }
 
-        return $mobileSignups;
+        foreach ($results[0]->data as $result) {
+            if ($result->created_at >= $startDate) {
+                $mobileUsers[] = $result;
+            }
+        }
+        if (count($mobileUsers) > 0) {
+            echo '- gatherMobileUsers() - page: ' . $page . ' of ' . $totalPages . ' for ' . $targetSource .
+                ' starting at ' . $startDate, PHP_EOL;
+        } else {
+            echo '- All data filtered out for ' . $targetSource . ' on page: ' . $page . ' starting at ' .
+                $startDate, PHP_EOL;
+        }
+
+        return [$mobileUsers, $totalPages];
     }
 
     /**
@@ -142,6 +135,10 @@ class MBP_UserImport_NorthstarTools
             '&limit=100&page=' . $page;
         $results = $this->mbToolboxcURL->curlGET($northstarUrl);
 
+        if ($results[1] != 200) {
+            throw new Exception('MBP_UserImport_NorthstarTools->getNorthstarData() Non 200 response: ' .
+                $results[1]);
+        }
         return $results;
     }
 }
