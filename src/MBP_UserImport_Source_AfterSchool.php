@@ -177,6 +177,11 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
           case 162474:
               $mobileCommonsOptinID = 209193;
               break;
+              
+          // Notes from Shawn
+          case 165211:
+              $mobileCommonsOptinID = 210265;
+              break;
 
           default:
               throw new Exception('Undefined After School Campaign ID: ' . $afterSchoolCampaignID);
