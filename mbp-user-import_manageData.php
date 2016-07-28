@@ -55,11 +55,21 @@ try {
 
                 $startDate = null;
                 if (isset($_GET['startDate'])) {
-                    $startDate = mktime(0, 0, 0, date("n", $_GET['startDate']), date("j", $_GET['startDate']) - 1,
-                        date("Y", $_GET['startDate']));
+                    if ($_GET['startDate'] == 'all') {
+                        $startDate = date ('c', mktime (0, 0, 0, 1, 1, 2016));
+                    } else {
+                        $startDate = mktime(0, 0, 0, date("n", $_GET['startDate']), date("j",
+                            $_GET['startDate']) - 1, date("Y", $_GET['startDate']));
+                    }
                 } elseif (isset($argv[4])) {
-                    $startDate = date('c', mktime(0, 0, 0, date("n", $argv[4]), date("j", $argv[4]) - 1,
-                        date("Y", $argv[4])));
+                    if ($argv[4] == 'all') {
+                        $startDate = date ('c', mktime (0, 0, 0, 1, 1, 2016));
+                    } else {
+                        $startDate = date ('c', mktime (0, 0, 0, date ("n", $argv[4]), date ("j", $argv[4]) - 1,
+                            date ("Y", $argv[4])));
+                    }
+                } elseif (empty($argv[4])) {
+                    $startDate = date ('c', mktime (0, 0, 0, 1, 1, 2016));
                 }
 
                 $mbpUserImportProducer = new MBP_UserImport_Producer();

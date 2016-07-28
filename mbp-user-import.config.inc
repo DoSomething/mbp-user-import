@@ -2,7 +2,8 @@
 /**
  * Message Broker configuration settings for mbp-user-import
  */
- 
+
+use DoSomething\MessageBroker\MessageBroker;
 use DoSomething\MB_Toolbox\MB_Configuration;
 use DoSomething\MB_Toolbox\MB_RabbitMQManagementAPI;
 use DoSomething\StatHat\Client as StatHat;

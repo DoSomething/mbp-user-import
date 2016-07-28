@@ -1,8 +1,9 @@
 <?php
 /**
- * Message Broker configuration settings for mbp-user-import
+ * Message Broker configuration settings for mbp-user-import_manageData
  */
- 
+
+use DoSomething\MessageBroker\MessageBroker;
 use DoSomething\MB_Toolbox\MB_Configuration;
 use DoSomething\MB_Toolbox\MB_Toolbox_cURL;
 use DoSomething\MB_Toolbox\MB_RabbitMQManagementAPI;

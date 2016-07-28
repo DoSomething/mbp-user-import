@@ -85,10 +85,11 @@ class MBP_UserImport_Source_MobileappIos extends MBP_UserImport_BaseSource
         $message['source'] = $data['source'];
 
         if (isset($data['first_name'])) {
-            // Remove unprintable characters
-            $firstName = preg_replace ('/[\x00-\x1F\x7f-\xFF]/', '', $data['first_name']);
-            if (!empty($firstName)) {
-                $message['first_name'] = ucwords ($firstName);
+            // Validate all characters in first name are supported as following UTF-8 encoding
+            if (mb_check_encoding($data['first_name'], 'UTF-8')) {
+                $message['first_name'] = ucwords($data['first_name']);
+            } else {
+                $message['first_name'] = ucwords(mb_convert_encoding($data['first_name'], "UTF-8"));
             }
         }
 
