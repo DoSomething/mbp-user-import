@@ -5,9 +5,10 @@
  */
 namespace DoSomething\MBP_UserImport;
 
+use DoSomething\MessageBroker\MessageBroker;
 use DoSomething\MB_Toolbox\MB_Configuration;
 
-define('ENVIROMENT', 'local');
+define('ENVIRONMENT', 'local');
 define('CONFIG_PATH', __DIR__ . '/../messagebroker-config');
 
 class MBP_UserImportTest extends \PHPUnit_Framework_TestCase {
@@ -18,40 +19,18 @@ class MBP_UserImportTest extends \PHPUnit_Framework_TestCase {
     private $mbConfig;
 
     /**
+     * @var array $sources Possible source values.
+     */
+    private $sources;
+
+    /**
      * Common functionality to all tests. Load configuration settings and properties.
      */
     public function setUp()
     {
         require_once __DIR__ . '/../mbp-user-import.config.inc';
         $this->mbConfig = MB_Configuration::getInstance();
-    }
-
-    /**
-     *
-     */
-    public function testFindNextTargetFile()
-    {
-
-    // Create  MBP_UserImport_Producer object to access findNextTargetFile() method for testing
-    $mbpUserImport = new MBP_UserImport_Producer();
-    
-    /*
-    foreach ($sources as $source) {
-      
-      // Create temporary file "00-test.csv" in each of the source directories
-      $testFile = __DIR__ . '/../data/' . $source . '/00-test.csv';
-      $testFileStatus = touch($testFile);
-      $targetCSVFile = $mbpUserImport->findNextTargetFile($source);
-      
-      $testNameLoc = strpos($targetCSVFile, '00-test.csv');
-      $this->assertGreaterThan(0, $testNameLoc);
-      
-      // Remove the test file
-      $this->assertTrue(unlink($testFile));
-      
-    }
-    */
-
+        $this->sources = unserialize(ALLOWED_SOURCES);
     }
 
     /**
@@ -93,10 +72,37 @@ class MBP_UserImportTest extends \PHPUnit_Framework_TestCase {
             get_class($mbRabbitMQManagementAPI) == 'DoSomething\MB_Toolbox\MB_RabbitMQManagementAPI'
         );
         $messageBroker = $this->mbConfig->getProperty('messageBroker');
-        $this->assertEquals(true, get_class($messageBroker) == 'MessageBroker');
+        $this->assertEquals(true, get_class($messageBroker) == 'DoSomething\MessageBroker\MessageBroker');
         $messageBrokerLogging = $this->mbConfig->getProperty('messageBrokerLogging');
-        $this->assertEquals(true, get_class($messageBrokerLogging) == 'MessageBroker');
+        $this->assertEquals(true, get_class($messageBrokerLogging) == 'DoSomething\MessageBroker\MessageBroker');
         $messageBroker_deadLetter = $this->mbConfig->getProperty('messageBroker_deadLetter');
-        $this->assertEquals(true, get_class($messageBroker_deadLetter) == 'MessageBroker');
+        $this->assertEquals(true, get_class($messageBroker_deadLetter) == 'DoSomething\MessageBroker\MessageBroker');
+    }
+
+    /**
+     * Ensure mbConfig->getProperty returns expected value types.
+     *
+     * @covers \DoSomething\MBP_UserImport\MBP_UserImport_Producer::findNextTargetFile()
+     * @uses   \DoSomething\MBP_UserImport\MBP_UserImport_Producer
+     */
+    public function testFindNextTargetFile()
+    {
+
+        // Create  MBP_UserImport_Producer object to access findNextTargetFile() method for testing
+        $mbpUserImport = new MBP_UserImport_Producer();
+
+        foreach ($this->sources as $source) {
+
+            // Create temporary file "00-test.csv" in each of the source directories
+            $testFile = __DIR__ . '/../data/' . $source . '/00-test.csv';
+            $testFileStatus = touch ($testFile);
+            $targetCSVFile = $mbpUserImport->findNextTargetFile($source);
+
+            $testNameLoc = strpos($targetCSVFile, '00-test.csv');
+            $this->assertGreaterThan (0, $testNameLoc);
+
+            // Remove the test file
+            $this->assertTrue (unlink ($testFile));
+        }
     }
 }
