@@ -1,7 +1,7 @@
 {
   "name": "mbp-user-import",
   "type": "project",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A producer application for the Quicksilver system that manages importing user data from various sources.",
   "keywords": ["message broker", "quicksilver", "user imports"],
   "homepage": "https://github.com/DoSomething/mbp-user-import",

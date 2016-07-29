@@ -1,6 +1,6 @@
 {
   "name": "mbp-user-import",
-  "version": "0.0.1",
+  "version": "0.4.1",
   "description": "Task runner for mbp-user-import application to run code linting and validation tests in a watchful state.",
   "engines": {
     "node": ">=4.4.x"
