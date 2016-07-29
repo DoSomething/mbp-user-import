@@ -91,7 +91,12 @@ class MBP_UserImportTest extends \PHPUnit_Framework_TestCase {
         // Create  MBP_UserImport_Producer object to access findNextTargetFile() method for testing
         $mbpUserImport = new MBP_UserImport_Producer();
 
-        foreach ($this->sources as $source) {
+        $sources = [
+            'AfterSchool',
+            'Niche',
+        ];
+
+        foreach ($sources as $source) {
 
             // Create temporary file "00-test.csv" in each of the source directories
             $testFile = __DIR__ . '/../data/' . $source . '/00-test.csv';
