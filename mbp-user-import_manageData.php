@@ -71,6 +71,9 @@ try {
                         $startDate = date ('c', mktime (0, 0, 0, date("n", $argv[4]), date("j", $argv[4]) - 1,
                             date("Y", $argv[4])));
                     }
+                } else {
+                    $startDate = date ('c', mktime (0, 0, 0, date("n"), date("j") - 1,
+                        date("Y")));
                 }
 
                 $mbpUserImportProducer = new MBP_UserImport_Producer();

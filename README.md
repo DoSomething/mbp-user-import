@@ -90,3 +90,4 @@ Runs PHPUnit tests and basic PHP Lint in a watchful state.
 - Start Date: optional, defaults to the start of yesterday.
   - Format YYYY-MM-DD
   - "all" to get all available data for `source` value.
+  - "today" for a date for yesterday
