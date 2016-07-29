@@ -24,6 +24,11 @@ class MBP_UserImportTest extends \PHPUnit_Framework_TestCase {
     private $sources;
 
     /**
+     * @var object $mbpUserImport_Producer Instance of class for running tests against.
+     */
+    private $mbpUserImport_Producer;
+
+    /**
      * Common functionality to all tests. Load configuration settings and properties.
      */
     public function setUp()
@@ -31,6 +36,8 @@ class MBP_UserImportTest extends \PHPUnit_Framework_TestCase {
         require_once __DIR__ . '/../mbp-user-import.config.inc';
         $this->mbConfig = MB_Configuration::getInstance();
         $this->sources = unserialize(ALLOWED_SOURCES);
+
+        $this->mbpUserImport_Producer = new MBP_UserImport_Producer();
     }
 
     /**
@@ -84,12 +91,11 @@ class MBP_UserImportTest extends \PHPUnit_Framework_TestCase {
      *
      * @covers \DoSomething\MBP_UserImport\MBP_UserImport_Producer::findNextTargetFile()
      * @uses   \DoSomething\MBP_UserImport\MBP_UserImport_Producer
+     *
+     * @todo Move to MBP_UserImport_ProducerTest
      */
     public function testFindNextTargetFile()
     {
-
-        // Create  MBP_UserImport_Producer object to access findNextTargetFile() method for testing
-        $mbpUserImport = new MBP_UserImport_Producer();
 
         $sources = [
             'AfterSchool',
@@ -101,8 +107,9 @@ class MBP_UserImportTest extends \PHPUnit_Framework_TestCase {
             // Create temporary file "00-test.csv" in each of the source directories
             $testFile = __DIR__ . '/../data/' . $source . '/00-test.csv';
             $testFileStatus = touch ($testFile);
-            $targetCSVFile = $mbpUserImport->findNextTargetFile($source);
+            $targetCSVFile = $this->mbpUserImport_Producer->findNextTargetFile($source);
 
+            // Test that the file was found by the method
             $testNameLoc = strpos($targetCSVFile, '00-test.csv');
             $this->assertGreaterThan (0, $testNameLoc);
 
