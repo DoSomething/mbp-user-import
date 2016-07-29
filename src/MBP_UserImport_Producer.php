@@ -242,7 +242,7 @@ class MBP_UserImport_Producer extends MB_Toolbox_BaseProducer
      *
      * @return string
      */
-    private function normalizeSource($source) {
+    public function normalizeSource($source) {
 
         $sourceNames = explode('_', $source);
         $classWords = [];
