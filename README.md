@@ -78,16 +78,21 @@ Runs PHPUnit tests and basic PHP Lint in a watchful state.
 ###From Command Line
 
 **mbp-user-import.php**
-`$ php mbp-user-import.php <enviroment>`
+
+`$ php mbp-user-import.php <enviroment> <target file> <source>`
+
 - Enviroment: <test | dev | prod>
+- Target File: <"nextFile" or specific CSV file name> 
+- Source: <Niche | AfterSchool>
 
 **mbp-user-import_manageData.php**
 
 `$ php mbp-user-import_manageData.php <enviroment> <source> <page> <start date>`
+
 - Enviroment: <test | dev | prod>
 - Source: <Niche | AfterSchool | mobileapp_ios | mobileapp_android>
-- Page: optional, defaults to 1.
-- Start Date: optional, defaults to the start of yesterday.
+- Page: optional for "mobileapp" Sources, defaults to 1.
+- Start Date: optional for "mobileapp" Sources, defaults to the start of yesterday. One of:
   - Format YYYY-MM-DD
   - "all" to get all available data for `source` value.
   - "today" for a date for yesterday
