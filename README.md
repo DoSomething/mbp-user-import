@@ -79,17 +79,17 @@ Runs PHPUnit tests and basic PHP Lint in a watchful state.
 
 **mbp-user-import.php**
 
-`$ php mbp-user-import.php <enviroment> <target file> <source>`
+`$ php mbp-user-import.php <environment> <target file> <source>`
 
-- Enviroment: <test | dev | prod>
+- Enviroment: <local | dev | prod>
 - Target File: <"nextFile" or specific CSV file name> 
 - Source: <Niche | AfterSchool>
 
 **mbp-user-import_manageData.php**
 
-`$ php mbp-user-import_manageData.php <enviroment> <source> <page> <start date>`
+`$ php mbp-user-import_manageData.php <environment> <source> <page> <start date>`
 
-- Enviroment: <test | dev | prod>
+- Environment: <local | dev | prod>
 - Source: <Niche | AfterSchool | mobileapp_ios | mobileapp_android>
 - Page: optional for "mobileapp" Sources, defaults to 1.
 - Start Date: optional for "mobileapp" Sources, defaults to the start of yesterday. One of:
