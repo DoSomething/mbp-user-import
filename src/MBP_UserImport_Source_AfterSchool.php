@@ -183,6 +183,12 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
               $mobileCommonsOptinID = 210265;
               break;
 
+          // Lose your v-card
+          case 170635:
+              // https://secure.mcommons.com/campaigns/147275/opt_in_paths/213995
+              $mobileCommonsOptinID = 213995;
+              break;
+
           default:
               throw new Exception('Undefined After School Campaign ID: ' . $afterSchoolCampaignID);
               break;
