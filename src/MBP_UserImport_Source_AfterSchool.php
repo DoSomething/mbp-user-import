@@ -42,7 +42,7 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
 
         return $keys;
     }
-  
+
   /**
    * Logic to determine if data from row in After School CSV file can be processed.
    *
@@ -177,16 +177,15 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
           case 162474:
               $mobileCommonsOptinID = 209193;
               break;
-              
+
           // Notes from Shawn
           case 165211:
               $mobileCommonsOptinID = 210265;
               break;
 
-          // Lose your v-card
+          // Find Your V-Spot
           case 170635:
-              // https://secure.mcommons.com/campaigns/147275/opt_in_paths/213995
-              $mobileCommonsOptinID = 213995;
+              $mobileCommonsOptinID = 218293;
               break;
 
           default:
