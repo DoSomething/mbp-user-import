@@ -183,9 +183,9 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
               $mobileCommonsOptinID = 210265;
               break;
 
-          // Find Your V-Spot
+          // Explain the Pain
           case 170635:
-              $mobileCommonsOptinID = 218293;
+              $mobileCommonsOptinID = 219406;
               break;
 
           default:
