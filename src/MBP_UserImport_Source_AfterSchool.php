@@ -183,9 +183,9 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
               $mobileCommonsOptinID = 210265;
               break;
 
-          // Explain the Pain
+          // New Year, New US
           case 170635:
-              $mobileCommonsOptinID = 219406;
+              $mobileCommonsOptinID = 222700;
               break;
 
           default:
