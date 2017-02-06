@@ -183,9 +183,9 @@ class MBP_UserImport_Source_AfterSchool extends MBP_UserImport_BaseSource
               $mobileCommonsOptinID = 210265;
               break;
 
-          // New Year, New US
+          // Shower Songs
           case 170635:
-              $mobileCommonsOptinID = 222700;
+              $mobileCommonsOptinID = 223867;
               break;
 
           default:
