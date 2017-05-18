@@ -90,7 +90,7 @@ Runs PHPUnit tests and basic PHP Lint in a watchful state.
 `$ php mbp-user-import_manageData.php <environment> <source> <page> <start date>`
 
 - Environment: <local | dev | prod>
-- Source: <Niche | AfterSchool | mobileapp_ios | mobileapp_android>
+- Source: <Niche | AfterSchool>
 - Page: optional for "mobileapp" Sources, defaults to 1.
 - Start Date: optional for "mobileapp" Sources, defaults to the start of yesterday. One of:
   - Format YYYY-MM-DD

@@ -16,9 +16,7 @@ use DoSomething\MB_Toolbox\MB_Configuration;
 class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
 {
 
-    const USER_COUNTRY = 'US';
-    const MOBILE_OPT_IN_PATH_ID = 164905;
-    const MAILCHIMP_LIST_ID = 'f2fab1dfd4';
+  const USER_COUNTRY = 'US';
 
   /**
    * Supported key / columns in CSV file from source.
@@ -94,16 +92,8 @@ class MBP_UserImport_Source_Niche extends MBP_UserImport_BaseSource
    */
     public function setter(&$data)
     {
-
         // All niche users are assumed to be from the United States.
         $data['user_country'] = self::USER_COUNTRY;
-
-        // Send all numbers to US mobile service
-        // Mobile Commons opt-in path when user registers for site
-        $data['mobile_opt_in_path_id'] = self::MOBILE_OPT_IN_PATH_ID;
-
-        // General MailChimp list for US users.
-        $data['mailchimp_list_id'] = self::MAILCHIMP_LIST_ID;
     }
 
   /**
