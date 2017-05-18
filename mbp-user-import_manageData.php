@@ -44,42 +44,6 @@ try {
     $source = validateSource($source);
     if (!empty($source)) {
         switch ($source) {
-            case 'mobileapp_ios':
-            case 'mobileapp_android':
-                $page = 1;
-                if (isset($_GET['page'])) {
-                    $page = $_GET['page'];
-                } elseif (isset($argv[3])) {
-                    $page = $argv[3];
-                }
-
-                $startDate = null;
-                if (isset($_GET['startDate'])) {
-                    if ($_GET['startDate'] == 'all') {
-                        $startDate = date ('c', mktime (0, 0, 0, 1, 1, 2016));
-                    } else {
-                        $startDate = mktime(0, 0, 0, date("n", $_GET['startDate']), date("j",
-                            $_GET['startDate']) - 1, date("Y", $_GET['startDate']));
-                    }
-                } elseif (isset($argv[4])) {
-                    if ($argv[4] == 'all') {
-                        $startDate = date ('c', mktime (0, 0, 0, 1, 1, 2016));
-                    } elseif ($argv[4] == 'today') {
-                        $startDate = date ('c', mktime (0, 0, 0, date("n"), date("j") - 1,
-                            date("Y")));
-                    } else {
-                        $startDate = date ('c', mktime (0, 0, 0, date("n", $argv[4]), date("j", $argv[4]) - 1,
-                            date("Y", $argv[4])));
-                    }
-                } else {
-                    $startDate = date ('c', mktime (0, 0, 0, date("n"), date("j") - 1,
-                        date("Y")));
-                }
-
-                $mbpUserImportProducer = new MBP_UserImport_Producer();
-                $status = $mbpUserImportProducer->produceNorthstarMobileUsers($source, $startDate, $page);
-                break;
-
             case 'Niche':
             case 'AfterSchool':
                 $mbpUserImportCSVfileTools = new MBP_UserImport_CSVfileTools();
