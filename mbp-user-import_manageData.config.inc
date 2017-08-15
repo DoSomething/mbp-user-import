@@ -49,13 +49,6 @@ $mbConfig->setProperty('gmail', $emailServer->authenticate(
     getenv("GMAIL_MACHINE_PASSWORD")
 ));
 
-// Northstar
-$mbConfig->setProperty('northstar_config', [
-    'host' => getenv("NORTHSTAR_API_HOST"),
-    'id' => getenv("NORTHSTAR_API_ID"),
-    'key' => getenv('NORTHSTAR_API_KEY'),
-]);
-
 $mbConfig->setProperty('mbToolboxCURL', new MB_Toolbox_cURL());
 
 $rabbitCredentials = $mbConfig->getProperty('rabbit_credentials');
